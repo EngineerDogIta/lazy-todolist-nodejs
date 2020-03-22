@@ -1,0 +1,22 @@
+extends layouts/main-layout.pug
+
+block content
+    .container
+        .row
+            .col-lg
+                form(action="admin/addProduct" method="get")
+                    .form-group
+                        label(for="taskText") Compito da fare
+                        input(type="text" name="taskText" id="taskText" class="form-control")
+                    button.btn.btn-primary(type="submit") Aggiungi compito
+            .col-sm
+                ul(id="task-list" class="list-group" style="list-style-type: none")
+                    if tasklist.length > 0
+                        each task in tasklist
+                            li(id="task-item")
+                                a(id="modify-state" class="list-group-item") #{task.taskTitle}
+                    else
+                        li(id="task-item" class="list-group-item disabled")
+                            a(id="modify-state") Niente
+        .container
+            button.btn.btn-light Salva i compiti
