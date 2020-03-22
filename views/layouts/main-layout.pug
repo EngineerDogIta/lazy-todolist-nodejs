@@ -7,14 +7,16 @@ html(lang="en")
         link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh", crossorigin="anonymous")
         script(src="scripts/main.js")
         script(src="https://kit.fontawesome.com/ac389a6c76.js" crossorigin="anonymous")
-        title Da Fare
+        title #{pageTitle}
     body
         .container
             nav.navbar.navbar-default.navbar-static-top
                 .container
                     .navbar-header
-                        a.nav-link(href="/") Home
-                    a.nav-link(href="/opzioni")
+                        a.nav-link(href="/" aria-label="Homepage") Home
+                    a.nav-link(href="/addTaskPage" aria-label="Add a task")
+                        i.fas.fa-plus
+                    a.nav-link(href="/opzioni" aria-label="Settings")
                         i.fas.fa-cog
         block content
 

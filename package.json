@@ -13,7 +13,8 @@
     "express": "4.17.1",
     "fund": "^1.0.0",
     "nodemon": "^2.0.2",
-    "pug": "2.0.4"
+    "pug": "2.0.4",
+    "body-parser": "1.19.0"
   },
   "description": ""
 }

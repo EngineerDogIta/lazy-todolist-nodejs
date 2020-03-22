@@ -1,19 +1,24 @@
 const express = require('express')
-const APP_PORT = 3000
+const path = require('path')
+const bodyParser = require('body-parser')
 
-const errorController = require('../controllers/error.js')
+const APP_PORT = 3000
+const tasks = []
 
 const app = express()
 
 app.set('view engine', 'pug')
 app.set('views', 'views')
 
-const adminData = require('./routes/admin');
-const taskRoutes = require('./routes/task');
+app.use('/', (req, res, next) => {
+    res.render('home', {
+        tasklist: tasks,
+        pageTitle: 'Giornalino a puntini'
+    })
+})
 
-app.use('/admin', adminData.routes);
-app.use(taskRoutes);
-
-app.use(errorController.get404)
+app.use(function (req, res, next) {
+    return res.status(404).render('error')
+})
 
 app.listen(APP_PORT)
