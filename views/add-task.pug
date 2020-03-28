@@ -1,0 +1,11 @@
+extends layouts/main-layout.pug
+
+block content
+    .container
+        .row
+            .col
+                form(action="admin/add-task" method="get")
+                    .form-group
+                        label(for="taskText") Compito da fare
+                        input.form-control(type="text" name="taskText" id="taskText")
+                    button.btn.btn-primary(type="submit") Aggiungi compito

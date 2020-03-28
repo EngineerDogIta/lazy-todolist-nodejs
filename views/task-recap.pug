@@ -1,0 +1,14 @@
+extends layouts/main-layout.pug
+
+block content
+    .container
+        .row
+            .col
+                ul(id="task-list" class="list-group" style="list-style-type: none")
+                    if tasklist.length > 0
+                        each task in tasklist
+                            li(id="task-item")
+                                a(id="modify-state" class="list-group-item") #{task.taskText}
+                    else
+                        li(id="task-item" class="list-group-item disabled")
+                            a(id="modify-state") Niente

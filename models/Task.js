@@ -1,14 +1,14 @@
 const path = require('path')
 const fs = require('fs')
 
-const p = path.join(__dirname, '/../', 'data', 'tasks.json')
+const fileJSONStorage = path.join(path.dirname(process.mainModule.filename), 'data', 'tasks.json')
 
 const getTaskFromFile = cb => {
-    fs.readFile(p, (err, fileContent) =>{
+    fs.readFile(fileJSONStorage, (err, fileContent) =>{
         if (err) {
             cb([])
         } else {
-            console.log(__dirname)
+            console.log(fileJSONStorage.toString())
             cb(JSON.parse(fileContent))
         }
     })
@@ -16,13 +16,13 @@ const getTaskFromFile = cb => {
 
 module.exports = class Task {
     constructor(t) {
-        this.title = t
+        this.taskText = t
     }
 
     save() {
         getTaskFromFile(tasks => {
             tasks.push(this)
-            fs.writeFile(p, stringify(products), err => {
+            fs.writeFile(fileJSONStorage, JSON.stringify(tasks), err => {
                 console.log(err)
             })
         })

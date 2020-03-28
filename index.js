@@ -14,8 +14,9 @@ app.set('views', 'views')
 
 app.use('/wp', errorRouter.getWPage)
 
-app.use('/admin', adminRoutes)
 app.use(taskRoutes)
+
+app.use('/admin', adminRoutes)
 
 app.use(errorRouter.getErrorPage)
 
