@@ -33,3 +33,8 @@ exports.getAllTasks = (req, res, next) => {
         })
     })
 }
+
+exports.getDeleteTask = (req, res, next) => {
+    Task.deleteByTaskText(req.query.taskText)
+    res.redirect('/tasks')
+}

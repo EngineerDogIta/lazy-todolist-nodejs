@@ -8,4 +8,5 @@ router.get('/add-task', taskController.getAddTask)
 
 router.post('/add-task', taskController.postAddTask)
 
+router.get('/delete-task', taskController.getDeleteTask)
 module.exports = router

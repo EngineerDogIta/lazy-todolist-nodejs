@@ -9,6 +9,10 @@ block content
                         each task in tasklist
                             li(id="task-item")
                                 a(id="modify-state" class="list-group-item") #{task.taskText}
+                                form(action="/admin/delete-task", method="get")
+                                    input(type="hidden", name="taskText" value=task.taskText)
+                                    button(type="submit")
+                                        i.fa.fa-trash(aria-hidden="true")
                     else
                         li(id="task-item" class="list-group-item disabled")
                             a(id="modify-state") Niente

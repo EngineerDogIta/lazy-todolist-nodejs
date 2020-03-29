@@ -4,7 +4,7 @@ const fs = require('fs')
 const fileJSONStorage = path.join(path.dirname(process.mainModule.filename), 'data', 'tasks.json')
 
 const getTaskFromFile = cb => {
-    fs.readFile(fileJSONStorage, (err, fileContent) =>{
+    fs.readFile(fileJSONStorage, (err, fileContent) => {
         if (err) {
             cb([])
         } else {
@@ -30,5 +30,13 @@ module.exports = class Task {
 
     static fetchAll(cb) {
         getTaskFromFile(cb)
+    }
+
+    static deleteByTaskText(taskText) {
+        getTaskFromFile(tasksfromfile => {
+            fs.writeFile(fileJSONStorage, JSON.stringify(tasksfromfile.filter(task => task.taskText !== taskText)), err => {
+                console.log(err)
+            })
+        })
     }
 }
