@@ -7,14 +7,12 @@
     "start": "node index.js",
     "start-nodemon": "nodemon index.js"
   },
-  "author": "",
+  "author": "Yar D'Onofrio",
   "license": "ISC",
   "dependencies": {
     "express": "4.17.1",
-    "fund": "^1.0.0",
     "nodemon": "^2.0.2",
-    "pug": "2.0.4",
-    "body-parser": "1.19.0"
+    "pug": "2.0.4"
   },
-  "description": ""
+  "description": "A lazy todolist web app for lazy todoersss"
 }

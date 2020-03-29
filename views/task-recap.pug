@@ -8,11 +8,13 @@ block content
                     if tasklist.length > 0
                         each task in tasklist
                             li(id="task-item")
-                                a(id="modify-state" class="list-group-item") #{task.taskText}
-                                form(action="/admin/delete-task", method="get")
-                                    input(type="hidden", name="taskText" value=task.taskText)
-                                    button(type="submit")
-                                        i.fa.fa-trash(aria-hidden="true")
+                                .container
+                                    .row.m-1
+                                        a.list-group-item(id="modify-state") #{task.taskText}
+                                        form.m-2(action="/admin/delete-task", method="get")
+                                            input(type="hidden", name="taskText" value=task.taskText)
+                                            button.btn.btn-light(type="submit")
+                                                i.fa.fa-trash(aria-hidden="true")
                     else
                         li(id="task-item" class="list-group-item disabled")
                             a(id="modify-state") Niente
