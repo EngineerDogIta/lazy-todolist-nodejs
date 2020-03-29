@@ -5,7 +5,7 @@ const errorRouter = require('./routes/error')
 const adminRoutes = require('./routes/admin')
 const taskRoutes = require('./routes/task')
 
-const APP_PORT = 3000
+const port = process.env.PORT || 8080
 
 const app = express()
 
@@ -22,4 +22,4 @@ app.use('/admin', adminRoutes)
 
 app.use(errorRouter.getErrorPage)
 
-app.listen(APP_PORT)
+app.listen(port)
