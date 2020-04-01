@@ -35,6 +35,8 @@ exports.getAllTasks = (req, res, next) => {
 }
 
 exports.getDeleteTask = (req, res, next) => {
-    Task.deleteByTaskText(req.query.taskText)
+    const taskToDelete = req.query.taskText
+    console.log('deleting ' + taskToDelete)
+    Task.deleteByTaskText(taskToDelete)
     res.redirect('/tasks')
 }

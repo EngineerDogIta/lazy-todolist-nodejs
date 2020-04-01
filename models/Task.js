@@ -8,10 +8,17 @@ const getTaskFromFile = cb => {
         if (err) {
             cb([])
         } else {
-            console.log(fileJSONStorage.toString())
             cb(JSON.parse(fileContent))
         }
     })
+}
+
+const errHandler = error => {
+    if (err == null) {
+        console.log('tasks.json Saved')
+    } else {
+        console.log(err)
+    }
 }
 
 module.exports = class Task {
@@ -22,9 +29,7 @@ module.exports = class Task {
     save() {
         getTaskFromFile(tasks => {
             tasks.push(this)
-            fs.writeFile(fileJSONStorage, JSON.stringify(tasks), err => {
-                console.log(err)
-            })
+            fs.writeFile(fileJSONStorage, JSON.stringify(tasks), errHandler)
         })
     }
 
@@ -34,9 +39,7 @@ module.exports = class Task {
 
     static deleteByTaskText(taskText) {
         getTaskFromFile(tasksfromfile => {
-            fs.writeFile(fileJSONStorage, JSON.stringify(tasksfromfile.filter(task => task.taskText !== taskText)), err => {
-                console.log(err)
-            })
+            fs.writeFile(fileJSONStorage, JSON.stringify(tasksfromfile.filter(task => task.taskText !== taskText)), errHandler)
         })
     }
 }
