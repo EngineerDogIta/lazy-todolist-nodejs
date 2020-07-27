@@ -52,15 +52,16 @@ exports.getAllTasks = (req, res, next) => {
     }).catch(error => {
         console.log('Got and error', error);
     });
-    
-    
 }
 
 exports.getDeleteTask = (req, res, next) => {
+    // console.log(req);
     Task.destroy({
         where: {
             title: req.query.taskText
         }
-    });
-    res.redirect('/tasks');
+    }).then(result => {
+        console.log('Deleted ',req.query.taskText);
+        res.redirect('/home');
+    }).catch(error => console.log('Got error deleting ', req.query.taskText, error));
 }

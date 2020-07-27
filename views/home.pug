@@ -10,11 +10,4 @@ block content
                         input(type="text" name="taskText" id="taskText" class="form-control")
                     button.btn.btn-primary(type="submit") Aggiungi compito
             .col-sm-5.offset-md-2.mt-5
-                ul(id="task-list" class="list-group" style="list-style-type: none")
-                    if tasklist.length > 0
-                        each task in tasklist
-                            li(id="task-item")
-                                a.list-group-item(id="modify-state") #{task.title}
-                    else
-                        li.list-group-item.disabled(id="task-item")
-                            a(id="modify-state") Niente
+                include layouts/tasks-layout.pug
