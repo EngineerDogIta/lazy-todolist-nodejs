@@ -1,3 +1,4 @@
 node_modules/
 data/
 data/tasks.json
+config/db.config.js
