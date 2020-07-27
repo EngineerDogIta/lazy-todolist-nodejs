@@ -58,10 +58,10 @@ exports.getDeleteTask = (req, res, next) => {
     // console.log(req);
     Task.destroy({
         where: {
-            title: req.query.taskText
+            id: req.query.taskId
         }
     }).then(result => {
-        console.log('Deleted ',req.query.taskText);
+        console.log('Deleted taskId:', req.query.taskId);
         res.redirect('/home');
     }).catch(error => console.log('Got error deleting ', req.query.taskText, error));
 }

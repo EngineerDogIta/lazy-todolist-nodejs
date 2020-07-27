@@ -7,7 +7,7 @@ ul(id="task-list" class="list-group" style="list-style-type: none")
                         a.list-group-item(id="modify-state") #{task.title}
                         // Delete form
                         form.m-2(action="/admin/delete-task", method="get")
-                            input(type="hidden", name="taskText" value=task.title)
+                            input(type="hidden", name="taskId" value=task.id)
                             button.btn.btn-light(type="submit")
                                 i.fa.fa-trash(aria-hidden="true")
     else
