@@ -10,9 +10,9 @@ block content
                             li(id="task-item")
                                 .container
                                     .row.m-1
-                                        a.list-group-item(id="modify-state") #{task.taskText}
+                                        a.list-group-item(id="modify-state") #{task.title}
                                         form.m-2(action="/admin/delete-task", method="get")
-                                            input(type="hidden", name="taskText" value=task.taskText)
+                                            input(type="hidden", name="taskText" value=task.title)
                                             button.btn.btn-light(type="submit")
                                                 i.fa.fa-trash(aria-hidden="true")
                     else

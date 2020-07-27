@@ -1,45 +1,23 @@
-const path = require('path')
-const fs = require('fs')
+const {
+    Sequelize,
+    DataTypes
+} = require('sequelize');
 
-const fileJSONStorage = path.join(path.dirname(process.mainModule.filename), 'data', 'tasks.json')
+const sequelize = require('../config/database');
 
-const getTaskFromFile = cb => {
-    fs.readFile(fileJSONStorage, (err, fileContent) => {
-        if (err) {
-            cb([])
-        } else {
-            cb(JSON.parse(fileContent))
-        }
-    })
-}
-
-const errHandler = error => {
-    if (err == null) {
-        console.log('tasks.json Saved')
-    } else {
-        console.log(err)
+const Task = sequelize.define('Task', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
-}
+}, {
+    // Altre opzioni
+});
 
-module.exports = class Task {
-    constructor(t) {
-        this.taskText = t
-    }
-
-    save() {
-        getTaskFromFile(tasks => {
-            tasks.push(this)
-            fs.writeFile(fileJSONStorage, JSON.stringify(tasks), errHandler)
-        })
-    }
-
-    static fetchAll(cb) {
-        getTaskFromFile(cb)
-    }
-
-    static deleteByTaskText(taskText) {
-        getTaskFromFile(tasksfromfile => {
-            fs.writeFile(fileJSONStorage, JSON.stringify(tasksfromfile.filter(task => task.taskText !== taskText)), errHandler)
-        })
-    }
-}
+module.exports = Task;

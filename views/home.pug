@@ -14,7 +14,7 @@ block content
                     if tasklist.length > 0
                         each task in tasklist
                             li(id="task-item")
-                                a.list-group-item(id="modify-state") #{task.taskText}
+                                a.list-group-item(id="modify-state") #{task.title}
                     else
                         li.list-group-item.disabled(id="task-item")
                             a(id="modify-state") Niente
