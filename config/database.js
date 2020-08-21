@@ -12,8 +12,9 @@ if (process.env.DATABASE_URL) {
     sequelize = new Sequelize(process.env.DATABASE_URL, {
         dialect: 'postgres',
         protocol: 'postgres',
-        ssl: true,
-        
+        dialectOptions: {
+            ssl: true
+        }
     });    
 } else {
     console.log('sqlite local db');
