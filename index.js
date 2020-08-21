@@ -28,5 +28,5 @@ sequelize.sync().then(result => {
     //console.log(result);
     app.listen(port);
 }).catch(error => {
-    console.log("Errore sincronizzazione");
+    console.log("Errore sincronizzazione", error);
 });
