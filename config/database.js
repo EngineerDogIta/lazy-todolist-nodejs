@@ -7,7 +7,14 @@ var sequelize;
 
 if (process.env.DATABASE_URL) {
     console.log('connecting to postgres');
-    sequelize = new Sequelize(process.env.DATABASE_URL);
+    //sequelize = new Sequelize(process.env.DATABASE_URL);
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+        dialect: 'postgres',
+        protocol: 'postgres',
+        dialectOptions: {
+            ssl: true
+        }
+    });
 } else {
     console.log('sqlite local db');
     sequelize = new Sequelize({
