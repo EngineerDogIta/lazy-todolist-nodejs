@@ -1,4 +1,4 @@
-const Task = require('../models/Task')
+const Task = require('../models/task')
 
 exports.postAddTask = (req, res, next) => {
     // const newTask = new Task(res.body.taskText);
