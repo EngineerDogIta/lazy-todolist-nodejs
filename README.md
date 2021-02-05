@@ -1,7 +1,6 @@
 # lazy-todolist-nodejs
-This is a todolist web application for lazy people
+This is an examplle of a tod list amed as a web app
+i'm currently hosting this app on heroku [lazy-todolist.herokuapp](https://lazy-todolist.herokuapp.com/home)
 
-Why we should do things, why i should make a todo list in first place?
-Let this software do it for you
-
-Lazy Work in progress....
+The web app puts the data on postgres
+right now, the tasks are public, if you ad a task, it will be visible to everyone
