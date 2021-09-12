@@ -1,23 +1,39 @@
+'use strict';
 const {
-    Sequelize,
-    DataTypes
+  Model
 } = require('sequelize');
-
-const sequelize = require('../config/database');
-
-const Task = sequelize.define('Task', {
+module.exports = (sequelize, DataTypes) => {
+  class Task extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  };
+  Task.init({
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
     },
     title: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
-}, {
-    // Altre opzioni
-});
-
-module.exports = Task;
+  }, {
+    sequelize,
+    modelName: 'Task',
+  });
+  return Task;
+};

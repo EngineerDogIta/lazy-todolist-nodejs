@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const sequelize = require('./config/database')
+const sequelize = require('./models/index').sequelize;
 
 const errorRouter = require('./routes/error');
 const adminRoutes = require('./routes/admin');

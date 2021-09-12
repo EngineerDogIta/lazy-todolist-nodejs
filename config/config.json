@@ -1,0 +1,9 @@
+{
+  "development": {
+    "dialect": "sqlite",
+    "storage": "./data/database.sqlite"
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL"
+  }
+}
