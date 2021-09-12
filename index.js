@@ -15,9 +15,9 @@ app.set('views', 'views');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/wp', errorRouter.getWPage);
-
 app.use(taskRoutes);
+
+app.use('/wp', errorRouter.getWPage);
 
 app.use('/admin', adminRoutes);
 
