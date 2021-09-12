@@ -14,13 +14,9 @@ app.set('view engine', 'pug');
 app.set('views', 'views');
 
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(taskRoutes);
-
 app.use('/wp', errorRouter.getWPage);
-
 app.use('/admin', adminRoutes);
-
 app.use(errorRouter.getErrorPage);
 
 sequelize.sync().then(result => {
