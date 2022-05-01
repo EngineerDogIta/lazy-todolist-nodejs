@@ -2,3 +2,11 @@ node_modules/
 data/
 data/tasks.json
 config/db.config.js
+
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+
+.idea/
