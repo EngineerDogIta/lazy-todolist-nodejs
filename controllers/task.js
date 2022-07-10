@@ -1,23 +1,37 @@
-const Task = require('../models/index').Task;
+const { PrismaClient, Prisma } = require('@prisma/client')
+const prisma = new PrismaClient();
 
 exports.postAddTask = (req, res, next) => {
-    // const newTask = new Task(res.body.taskText);
-    Task.create({
-        title: req.query.taskText
-    }).then(result=> {
-        console.log('inserted task', taskText);
-        res.redirect('/tasks')
-    }).catch(error => { 
+    if (req.query.taskText) {
+        let taskToCreate = Prisma.TaskCreateInput;
+
+        taskToCreate = {
+            title: req.query.taskText
+        }
+
+        prisma.task.create({
+            data: taskToCreate
+        }).then(res => {
+            console.log('inserted task', taskText);
+            res.redirect('/tasks');
+        }).catch(err => {
+            console.log('got error', error);
+            res.redirect('/error');
+        })
+    } else { 
         console.log('got error', error);
-    });
+        res.redirect('/error');
+    }
 }
 
 exports.getAddTask = (req, res, next) => {
     // const newTask = new Task(req.query.taskText);
-    const newTask = Task.create({
-        title: req.query.taskText
+    const newTask = prisma.tasks.create({
+        data: {
+            title: req.query.taskText
+        }
     }).then(result => {
-        console.log('inserted newTask id:', newTask.id);
+        console.log('inserted newTask id:', result);
     }).catch(error => {
         console.log('Found error', error);
     }).finally(onfinally => {
@@ -26,7 +40,7 @@ exports.getAddTask = (req, res, next) => {
 }
 
 exports.getHomeTasks = (req, res, next) => {
-    Task.findAll().then(result => {
+    prisma.tasks.findMany().then(result => {
         console.log("All tasks:", JSON.stringify(result, null, 2));
         res.render('home', {
             tasklist: result,
@@ -35,7 +49,7 @@ exports.getHomeTasks = (req, res, next) => {
     }).catch(error => {
         console.log('Got error', error);
     });
-    
+
 }
 
 exports.getAddTaskPage = (req, res, next) => {
@@ -43,7 +57,7 @@ exports.getAddTaskPage = (req, res, next) => {
 }
 
 exports.getAllTasks = (req, res, next) => {
-    Task.findAll().then(result => {
+    prisma.tasks.findMany().then(result => {
         console.log("All tasks:", JSON.stringify(result, null, 2));
         res.render('task-recap', {
             tasklist: result,
@@ -55,10 +69,11 @@ exports.getAllTasks = (req, res, next) => {
 }
 
 exports.getDeleteTask = (req, res, next) => {
-    // console.log(req);
-    Task.destroy({
+    // convert req.query.taskId to int
+    let taskId = parseInt(req.query.taskId);
+    prisma.tasks.delete({
         where: {
-            id: req.query.taskId
+            id: taskId
         }
     }).then(result => {
         console.log('Deleted taskId:', req.query.taskId);

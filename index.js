@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const sequelize = require('./models/index').sequelize;
 
 const errorRouter = require('./routes/error');
 const adminRoutes = require('./routes/admin');
@@ -19,10 +18,5 @@ app.use('/wp', errorRouter.getWPage);
 app.use('/admin', adminRoutes);
 app.use(errorRouter.getErrorPage);
 
-sequelize.sync().then(result => {
-    console.log("Sincronizzato");
-    //console.log(result);
-    app.listen(port);
-}).catch(error => {
-    console.log("Errore sincronizzazione", error);
-});
+//console.log(result);
+app.listen(port);

@@ -9,19 +9,16 @@
   "author": "Yar D'Onofrio",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^3.13.0",
     "express": "^4.17.1",
     "nodemon": "^2.0.12",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
     "pug": "^3.0.2",
-    "sequelize": "^6.3.3",
     "sqlite3": "^5.0.0"
   },
   "description": "A lazy todolist web app for lazy todoersss",
-  "engines": {
-    "node": "14.x"
-  },
   "devDependencies": {
-    "sequelize-cli": "^6.2.0"
+    "prisma": "^3.13.0"
   }
 }
