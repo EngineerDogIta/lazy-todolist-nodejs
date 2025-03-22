@@ -1,7 +1,6 @@
 {
-    "ignore" : [
-        "node_modules",
-        "public",
-        "data"
-    ]
+    "watch": ["src"],
+    "ext": ".js,.json",
+    "ignore": ["src/**/*.spec.js"],
+    "exec": "node ./src/index.js"
 }
