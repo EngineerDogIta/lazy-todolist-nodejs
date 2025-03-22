@@ -6,14 +6,14 @@ A simple todo list application built with Node.js and Express.
 
 ```
 src/
-  ├── components/     # Reusable UI components and static assets
   ├── config/        # Configuration files
+  │   ├── logger.ts  # Winston logger configuration
+  │   └── database.ts # SQLite database configuration
   ├── controllers/   # Route controllers
-  ├── lib/          # Utility functions and shared code
-  ├── models/       # Database models
+  ├── public/       # Static assets (CSS, JS, images)
   ├── routes/       # Express routes
-  ├── services/     # Business logic
-  └── views/        # Pug templates
+  ├── views/        # Pug templates
+  └── index.ts      # Application entry point
 ```
 
 ## Prerequisites
@@ -43,10 +43,19 @@ npm run dev
 
 The application will be available at `http://localhost:8080`
 
+## Production
+
+To run the application in production mode:
+```bash
+NODE_ENV=production npm start
+```
+
 ## Available Scripts
 
 - `npm start` - Start the production server
 - `npm run dev` - Start the development server with hot reload
+- `npm run build` - Build the application for production
+- `npm run clean` - Clean the dist directory
 - `npm run lint` - Run ESLint to check code style
 - `npm run format` - Format code using Prettier
 - `npm test` - Run tests
@@ -56,6 +65,50 @@ The application will be available at `http://localhost:8080`
 - Create, read, update, and delete todos
 - Simple and intuitive interface
 - SQLite database for data persistence
+- Comprehensive logging system with Winston
+- Environment-specific configurations
+- Error handling and monitoring
+- Request logging with performance tracking
+- Pug templating engine
+- TypeScript support
+- ESLint and Prettier for code quality
+
+## Logging
+
+The application uses Winston for structured logging with the following features:
+
+- Multiple log levels (error, warn, info, debug)
+- Environment-specific log formats:
+  - Development: Colorized console output with timestamps
+  - Production: JSON format with full error stack traces
+- Separate log files for errors and combined logs
+- Log rotation with 5MB file size limit and 5 files retention
+- Request logging with duration, status, and user agent info
+- Structured error tracking with context
+
+Logs are stored in:
+- Error logs: `logs/error.log`
+- Combined logs: `logs/combined.log`
+
+## Database
+
+SQLite database with automatic table creation:
+- Location: `data/database.sqlite`
+- Tables:
+  - tasks (id, title, createdAt, updatedAt)
+
+## Development Tools
+
+- TypeScript for type-safe development
+- ts-node-dev for hot reloading
+- ESLint with TypeScript support
+- Prettier for code formatting
+- Jest for testing
+
+## Environment Variables
+
+- `NODE_ENV` - Application environment (development/production)
+- `PORT` - Server port (default: 8080)
 
 ## Contributing
 
