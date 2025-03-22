@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 import path from 'path';
 
-const dbPath = path.join(__dirname, '../models/database.sqlite');
+const dbPath = path.join(__dirname, '../../data/database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
 // Create tasks table if it doesn't exist
