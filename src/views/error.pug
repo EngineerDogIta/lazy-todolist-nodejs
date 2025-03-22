@@ -1,0 +1,15 @@
+extends layouts/main-layout.pug
+
+block content
+    .container.text-center.py-5
+        .error-container
+            h1.display-4.text-danger.mb-4
+                i.fas.fa-exclamation-circle.mr-2
+                | Error
+            h2.mb-4= message
+            if error && Object.keys(error).length > 0
+                .alert.alert-danger
+                    pre.mb-0= error.stack
+            a.btn.btn-primary.mt-4(href="/")
+                i.fas.fa-home.mr-2
+                | Back to Home 
