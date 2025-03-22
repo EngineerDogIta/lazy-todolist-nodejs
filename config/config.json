@@ -4,11 +4,7 @@
     "storage": "./data/database.sqlite"
   },
   "production": {
-    "dialect": "postgresql",
-    "host": "db",
-    "port": 5432,
-    "database": "lazy_todolist",
-    "username": "postgres",
-    "password": "postgres"
+    "dialect": "sqlite",
+    "storage": "./data/database.sqlite"
   }
 }

@@ -1,82 +1,80 @@
-const { PrismaClient, Prisma } = require('@prisma/client')
-const prisma = new PrismaClient();
+const db = require('../config/database');
 
 exports.postAddTask = (req, res, next) => {
     if (req.query.taskText) {
-        let taskToCreate = Prisma.TaskCreateInput;
-
-        taskToCreate = {
-            title: req.query.taskText
-        }
-
-        prisma.task.create({
-            data: taskToCreate
-        }).then(res => {
-            console.log('inserted task', taskText);
-            res.redirect('/tasks');
-        }).catch(err => {
-            console.log('got error', error);
-            res.redirect('/error');
-        })
-    } else { 
-        console.log('got error', error);
+        const taskText = req.query.taskText;
+        db.run('INSERT INTO tasks (title) VALUES (?)', [taskText], function(err) {
+            if (err) {
+                console.log('Error inserting task:', err);
+                res.redirect('/error');
+            } else {
+                console.log('Inserted task:', taskText);
+                res.redirect('/tasks');
+            }
+        });
+    } else {
+        console.log('No task text provided');
         res.redirect('/error');
     }
 }
 
 exports.getAddTask = (req, res, next) => {
-    // const newTask = new Task(req.query.taskText);
-    const newTask = prisma.tasks.create({
-        data: {
-            title: req.query.taskText
-        }
-    }).then(result => {
-        console.log('inserted newTask id:', result);
-    }).catch(error => {
-        console.log('Found error', error);
-    }).finally(onfinally => {
-        res.redirect('/home');
-    });
+    if (req.query.taskText) {
+        const taskText = req.query.taskText;
+        db.run('INSERT INTO tasks (title) VALUES (?)', [taskText], function(err) {
+            if (err) {
+                console.log('Error inserting task:', err);
+                res.redirect('/error');
+            } else {
+                console.log('Inserted task:', taskText);
+                res.redirect('/home');
+            }
+        });
+    } else {
+        res.redirect('/error');
+    }
 }
 
 exports.getHomeTasks = (req, res, next) => {
-    prisma.tasks.findMany().then(result => {
-        console.log("All tasks:", JSON.stringify(result, null, 2));
-        res.render('home', {
-            tasklist: result,
-            pageTitle: 'Giornalino a puntini'
-        });
-    }).catch(error => {
-        console.log('Got error', error);
+    db.all('SELECT * FROM tasks ORDER BY createdAt DESC', [], (err, rows) => {
+        if (err) {
+            console.log('Error fetching tasks:', err);
+            res.redirect('/error');
+        } else {
+            res.render('home', {
+                tasklist: rows,
+                pageTitle: 'Giornalino a puntini'
+            });
+        }
     });
-
 }
 
 exports.getAddTaskPage = (req, res, next) => {
-    res.render('add-task')
+    res.render('add-task');
 }
 
 exports.getAllTasks = (req, res, next) => {
-    prisma.tasks.findMany().then(result => {
-        console.log("All tasks:", JSON.stringify(result, null, 2));
-        res.render('task-recap', {
-            tasklist: result,
-            pageTitle: 'Giornalino a puntini'
-        });
-    }).catch(error => {
-        console.log('Got and error', error);
+    db.all('SELECT * FROM tasks ORDER BY createdAt DESC', [], (err, rows) => {
+        if (err) {
+            console.log('Error fetching tasks:', err);
+            res.redirect('/error');
+        } else {
+            res.render('task-recap', {
+                tasklist: rows,
+                pageTitle: 'Giornalino a puntini'
+            });
+        }
     });
 }
 
 exports.getDeleteTask = (req, res, next) => {
-    // convert req.query.taskId to int
-    let taskId = parseInt(req.query.taskId);
-    prisma.tasks.delete({
-        where: {
-            id: taskId
+    const taskId = parseInt(req.query.taskId);
+    db.run('DELETE FROM tasks WHERE id = ?', [taskId], function(err) {
+        if (err) {
+            console.log('Error deleting task:', err);
+        } else {
+            console.log('Deleted taskId:', taskId);
         }
-    }).then(result => {
-        console.log('Deleted taskId:', req.query.taskId);
         res.redirect('/home');
-    }).catch(error => console.log('Got error deleting ', req.query.taskText, error));
+    });
 }

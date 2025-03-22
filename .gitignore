@@ -1,7 +1,7 @@
 node_modules/
 data/
-data/tasks.json
-config/db.config.js
+.env
+.DS_Store
 
 # Default ignored files
 /shelf/

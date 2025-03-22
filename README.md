@@ -1,18 +1,27 @@
 # lazy-todolist-nodejs
-This is an example of a todo list web app
+A simple todo list web application built with Node.js, Express, and Pug templates.
 
-The web app stores data in a database
-right now, the tasks are public, if you add a task, it will be visible to everyone,
-Be respectful please
+## Features
+- Add and manage todo tasks
+- Simple and clean interface
+- SQLite database for data persistence
 
-## Setup with Docker
+## Setup
 
-1. Make sure you have Docker and Docker Compose installed
-2. Clone this repository
-3. Run the following command to start the application:
+1. Clone this repository
+2. Install dependencies:
    ```bash
-   docker-compose up --build
+   npm install
+   ```
+3. Start the application:
+   ```bash
+   npm start
+   ```
+   For development with auto-reload:
+   ```bash
+   npm run dev
    ```
 4. The application will be available at http://localhost:8080
 
-The application uses PostgreSQL as the database, which is automatically set up in a Docker container.
+## Database
+The application uses SQLite as its database, which is automatically set up in the `data` directory.
