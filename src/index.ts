@@ -1,10 +1,10 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
+import express, { Request, Response, NextFunction } from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
 
-const taskRoutes = require('./routes/task');
+import taskRoutes from './routes/task';
 
-const port = process.env.PORT || 8080;
+const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 
 const app = express();
 
@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'components/public')));
 app.use('/', taskRoutes);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     console.error(err.stack);
     res.status(500).render('error', { 
         message: 'Something went wrong!',
@@ -29,6 +29,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(port, () => {
+app.listen(port, (): void => {
     console.log(`Server running on port ${port}`);
-});
+}); 
