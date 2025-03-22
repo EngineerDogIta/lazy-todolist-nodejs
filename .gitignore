@@ -1,12 +1,24 @@
+# Dependencies
 node_modules/
 data/
+
+# Environment variables
 .env
+
+# OS files
 .DS_Store
 
-# Default ignored files
+# IDE files
+.idea/
 /shelf/
 /workspace.xml
-# Editor-based HTTP Client requests
 /httpRequests/
 
-.idea/
+# TypeScript build output
+dist/
+*.tsbuildinfo
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
