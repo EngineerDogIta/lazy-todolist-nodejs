@@ -4,17 +4,18 @@ A simple todo list application built with Node.js and Express.
 
 ## Project Structure
 
-```
-src/
-  ├── config/        # Configuration files
-  │   ├── logger.ts  # Winston logger configuration
-  │   └── database.ts # SQLite database configuration
-  ├── controllers/   # Route controllers
-  ├── public/       # Static assets (CSS, JS, images)
-  ├── routes/       # Express routes
-  ├── views/        # Pug templates
-  └── index.ts      # Application entry point
-```
+- src/
+  - config/
+    - logger.ts         # Winston logger configuration
+    - database.ts       # SQLite database configuration
+  - controllers/        # Route controllers
+  - public/            # Static assets (CSS, JS, images)
+  - routes/            # Express routes
+  - views/             # Pug templates
+  - index.ts           # Application entry point
+- logs/                # Application logs
+- data/                # Database files
+- package.json         # Project dependencies and scripts
 
 ## Prerequisites
 
@@ -24,12 +25,14 @@ src/
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/lazy-todolist-nodejs.git
 cd lazy-todolist-nodejs
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -37,6 +40,7 @@ npm install
 ## Development
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -46,6 +50,7 @@ The application will be available at `http://localhost:8080`
 ## Production
 
 To run the application in production mode:
+
 ```bash
 NODE_ENV=production npm start
 ```
@@ -87,12 +92,14 @@ The application uses Winston for structured logging with the following features:
 - Structured error tracking with context
 
 Logs are stored in:
+
 - Error logs: `logs/error.log`
 - Combined logs: `logs/combined.log`
 
 ## Database
 
 SQLite database with automatic table creation:
+
 - Location: `data/database.sqlite`
 - Tables:
   - tasks (id, title, createdAt, updatedAt)
