@@ -6,7 +6,7 @@ block content
             h4.mb-4 
                 i.fas.fa-tasks.text-primary.mr-2
                 | Compito da fare
-            form(action="admin/add-task" method="get")
+            form(action="/" method="post")
                 .input-group
                     input.form-control(type="text" name="taskText" id="taskText" placeholder="Inserisci un nuovo compito..." required)
                     .input-group-append

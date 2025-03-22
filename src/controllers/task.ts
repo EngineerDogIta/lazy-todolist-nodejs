@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import db from '../config/database';
 
 interface Task {
@@ -13,7 +13,26 @@ const handleError = (err: Error, res: Response): void => {
 };
 
 const taskController = {
-    postAddTask: (req: Request, res: Response, next: NextFunction): void => {
+    postAddTask: (req: Request, res: Response): void => {
+        // Handle delete action
+        if (req.body.action === 'delete' && req.body.taskId) {
+            const taskId = parseInt(req.body.taskId);
+            if (isNaN(taskId)) {
+                return handleError(new Error('Invalid task ID'), res);
+            }
+
+            db.run('DELETE FROM tasks WHERE id = ?', [taskId], function(err: Error | null) {
+                if (err) {
+                    handleError(err, res);
+                } else {
+                    console.log('Deleted taskId:', taskId);
+                    res.redirect('/');
+                }
+            });
+            return;
+        }
+
+        // Handle add task action
         const taskText = req.body.taskText;
         if (!taskText) {
             console.log('No task text provided');
@@ -30,7 +49,7 @@ const taskController = {
         });
     },
 
-    getAddTask: (req: Request, res: Response, next: NextFunction): void => {
+    getAddTask: (req: Request, res: Response): void => {
         if (req.query.taskText) {
             const taskText = req.query.taskText as string;
             db.run('INSERT INTO tasks (title) VALUES (?)', [taskText], function(err: Error | null) {
@@ -39,7 +58,7 @@ const taskController = {
                     res.redirect('/error');
                 } else {
                     console.log('Inserted task:', taskText);
-                    res.redirect('/home');
+                    res.redirect('/');
                 }
             });
         } else {
@@ -47,13 +66,7 @@ const taskController = {
         }
     },
 
-    getAddTaskPage: (req: Request, res: Response, next: NextFunction): void => {
-        res.render('add-task', {
-            pageTitle: 'Aggiungi compito'
-        });
-    },
-
-    getHomeTasks: (req: Request, res: Response, next: NextFunction): void => {
+    getHomeTasks: (req: Request, res: Response): void => {
         db.all('SELECT * FROM tasks ORDER BY createdAt DESC', [], (err: Error | null, rows: Task[]) => {
             if (err) {
                 handleError(err, res);
@@ -66,7 +79,7 @@ const taskController = {
         });
     },
 
-    getAllTasks: (req: Request, res: Response, next: NextFunction): void => {
+    getAllTasks: (req: Request, res: Response): void => {
         db.all('SELECT * FROM tasks ORDER BY createdAt DESC', [], (err: Error | null, rows: Task[]) => {
             if (err) {
                 handleError(err, res);
@@ -75,22 +88,6 @@ const taskController = {
                     tasklist: rows,
                     pageTitle: 'Giornalino a puntini'
                 });
-            }
-        });
-    },
-
-    getDeleteTask: (req: Request, res: Response, next: NextFunction): void => {
-        const taskId = parseInt(req.query.taskId as string);
-        if (isNaN(taskId)) {
-            return handleError(new Error('Invalid task ID'), res);
-        }
-
-        db.run('DELETE FROM tasks WHERE id = ?', [taskId], function(err: Error | null) {
-            if (err) {
-                handleError(err, res);
-            } else {
-                console.log('Deleted taskId:', taskId);
-                res.redirect('/');
             }
         });
     }
