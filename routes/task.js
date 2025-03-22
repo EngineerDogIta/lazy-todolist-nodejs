@@ -1,4 +1,3 @@
-
 const express = require('express')
 
 const taskController = require('../controllers/task')
@@ -6,8 +5,7 @@ const taskController = require('../controllers/task')
 const router = express.Router()
 
 router.get('/', taskController.getHomeTasks)
-router.get('/home', taskController.getHomeTasks)
-router.get('/add-a-task', taskController.getAddTaskPage)
-router.get('/tasks', taskController.getAllTasks)
+router.get('/add-task', taskController.getAddTaskPage)
+router.post('/', taskController.postAddTask)
 
 module.exports = router
