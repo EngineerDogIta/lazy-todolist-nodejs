@@ -55,6 +55,46 @@ To run the application in production mode:
 NODE_ENV=production npm start
 ```
 
+## Docker Deployment
+
+The application can be deployed using Docker with PostgreSQL as the production database.
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Production Deployment
+
+1. Build and start the containers:
+
+```bash
+docker-compose up --build
+```
+
+The application will be available at `http://localhost:8080`
+
+### Environment Variables
+
+The following environment variables can be configured in the docker-compose.yml file:
+
+- `DB_USER`: PostgreSQL username (default: postgres)
+- `DB_HOST`: PostgreSQL host (default: postgres)
+- `DB_NAME`: PostgreSQL database name (default: todolist)
+- `DB_PASSWORD`: PostgreSQL password (default: postgres)
+- `DB_PORT`: PostgreSQL port (default: 5432)
+
+### Development
+
+For local development, the application uses SQLite as the database. To run the application locally:
+
+```bash
+npm install
+npm run dev
+```
+
+The SQLite database will be created in the `data` directory.
+
 ## Available Scripts
 
 - `npm start` - Start the production server
