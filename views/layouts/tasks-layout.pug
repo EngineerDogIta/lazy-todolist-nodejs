@@ -1,15 +1,14 @@
-ul(id="task-list" class="list-group" style="list-style-type: none")
-    if tasklist.length > 0
+if tasklist.length > 0
+    .list-group
         each task in tasklist
-            li(id="task-item")
-                .container
-                    .row.m-1
-                        a.list-group-item(id="modify-state") #{task.title}
-                        // Delete form
-                        form.m-2(action="/admin/delete-task", method="get")
-                            input(type="hidden", name="taskId" value=task.id)
-                            button.btn.btn-light(type="submit")
-                                i.fa.fa-trash(aria-hidden="true")
-    else
-        li(id="task-item" class="list-group-item disabled")
-            a(id="modify-state") Niente
+            .list-group-item.d-flex.justify-content-between.align-items-center.animate__animated.animate__fadeIn
+                span.task-title #{task.title}
+                form(action="/admin/delete-task", method="get")
+                    input(type="hidden", name="taskId" value=task.id)
+                    button.btn.btn-outline-danger.btn-sm(type="submit" title="Elimina")
+                        i.fa.fa-trash.mr-1
+                        | Elimina
+else
+    .empty-state
+        i.fas.fa-clipboard-check.mb-3
+        p.lead.mb-0 Nessun compito da fare

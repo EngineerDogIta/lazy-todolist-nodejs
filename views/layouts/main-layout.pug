@@ -5,24 +5,32 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="IE=7")
         link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh", crossorigin="anonymous")
+        link(href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css", rel="stylesheet")
+        link(href="/css/custom.css", rel="stylesheet")
         script(src="scripts/main.js")
         script(src="https://kit.fontawesome.com/ac389a6c76.js" crossorigin="anonymous")
         title #{pageTitle}
-    body
-        .container
-            nav.navbar.navbar-default.navbar-static-top
-                .container
-                    .navbar-header
-                        a.nav-link(href="/home" aria-label="Homepage") Home
-                    a.nav-link(href="/tasks" aria-label="tasks")
-                        i.fas.fa-list
-                    a.nav-link(href="/add-a-task" aria-label="Add a task")
-                        i.fas.fa-plus
-        block content
-
-        footer
+    body.bg-light
+        nav.navbar.navbar-expand-lg.navbar-light.bg-white
             .container
-                p
-                | Yari 2020 made with 😀 |
-                i.fa.fa-person(aria-hidden='true') &nbsp;
-                a(href='https://github.com/EngineerDogIta/lazy-todolist-nodejs') View Source
+                a.navbar-brand(href="/home") 
+                    i.fas.fa-check-double.text-primary.mr-2
+                    | Todo List
+                .navbar-nav.ml-auto
+                    a.nav-link.mx-2(href="/home" title="Home")
+                        i.fas.fa-home
+                    a.nav-link.mx-2(href="/tasks" title="Compiti")
+                        i.fas.fa-list
+                    a.nav-link.mx-2(href="/add-a-task" title="Aggiungi")
+                        i.fas.fa-plus
+        
+        .container.py-4
+            block content
+
+        footer.text-center.text-muted
+            .container
+                p.mb-0
+                    | Yari 2020 made with 😀 |
+                    a.text-decoration-none.ml-2(href='https://github.com/EngineerDogIta/lazy-todolist-nodejs')
+                        i.fab.fa-github.mr-1
+                        | View Source

@@ -9,12 +9,12 @@
   "author": "Yar D'Onofrio",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "pug": "^3.0.2",
-    "sqlite3": "^5.0.0"
+    "express": "^4.21.2",
+    "pug": "^3.0.3",
+    "sqlite3": "^5.1.7"
   },
   "description": "A lazy todolist web app for lazy todoersss",
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "nodemon": "^3.1.9"
   }
 }
