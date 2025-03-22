@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import db from '../config/database';
+import logger from '../config/logger';
+
 
 interface Task {
     id: number;
@@ -7,8 +9,13 @@ interface Task {
     createdAt: string;
 }
 
-const handleError = (err: Error, res: Response): void => {
-    console.log('Error:', err);
+const handleError = (err: Error, res: Response, context: string): void => {
+    logger.error('Error occurred:', { 
+        error: err.message, 
+        stack: err.stack,
+        context,
+        timestamp: new Date().toISOString()
+    });
     res.redirect('/');
 };
 
@@ -18,14 +25,17 @@ const taskController = {
         if (req.body.action === 'delete' && req.body.taskId) {
             const taskId = parseInt(req.body.taskId);
             if (isNaN(taskId)) {
-                return handleError(new Error('Invalid task ID'), res);
+                return handleError(new Error('Invalid task ID'), res, 'delete-task');
             }
 
             db.run('DELETE FROM tasks WHERE id = ?', [taskId], function(err: Error | null) {
                 if (err) {
-                    handleError(err, res);
+                    handleError(err, res, 'delete-task');
                 } else {
-                    console.log('Deleted taskId:', taskId);
+                    logger.info('Task deleted successfully', { 
+                        taskId,
+                        timestamp: new Date().toISOString()
+                    });
                     res.redirect('/');
                 }
             });
@@ -35,15 +45,21 @@ const taskController = {
         // Handle add task action
         const taskText = req.body.taskText;
         if (!taskText) {
-            console.log('No task text provided');
+            logger.warn('Task creation attempted without text', {
+                timestamp: new Date().toISOString()
+            });
             return res.redirect('/');
         }
 
         db.run('INSERT INTO tasks (title) VALUES (?)', [taskText], function(err: Error | null) {
             if (err) {
-                handleError(err, res);
+                handleError(err, res, 'create-task');
             } else {
-                console.log('Inserted task:', taskText);
+                logger.info('Task created successfully', { 
+                    taskText,
+                    taskId: this.lastID,
+                    timestamp: new Date().toISOString()
+                });
                 res.redirect('/');
             }
         });
@@ -54,14 +70,25 @@ const taskController = {
             const taskText = req.query.taskText as string;
             db.run('INSERT INTO tasks (title) VALUES (?)', [taskText], function(err: Error | null) {
                 if (err) {
-                    console.log('Error inserting task:', err);
+                    logger.error('Error creating task via GET:', { 
+                        error: err.message, 
+                        taskText,
+                        timestamp: new Date().toISOString()
+                    });
                     res.redirect('/error');
                 } else {
-                    console.log('Inserted task:', taskText);
+                    logger.info('Task created successfully via GET', { 
+                        taskText,
+                        taskId: this.lastID,
+                        timestamp: new Date().toISOString()
+                    });
                     res.redirect('/');
                 }
             });
         } else {
+            logger.warn('GET request attempted without task text', {
+                timestamp: new Date().toISOString()
+            });
             res.redirect('/error');
         }
     },
@@ -69,8 +96,12 @@ const taskController = {
     getHomeTasks: (req: Request, res: Response): void => {
         db.all('SELECT * FROM tasks ORDER BY createdAt DESC', [], (err: Error | null, rows: Task[]) => {
             if (err) {
-                handleError(err, res);
+                handleError(err, res, 'get-home-tasks');
             } else {
+                logger.debug('Tasks retrieved for home page', { 
+                    count: rows.length,
+                    timestamp: new Date().toISOString()
+                });
                 res.render('home', {
                     tasklist: rows,
                     pageTitle: 'Giornalino a puntini'
@@ -82,8 +113,12 @@ const taskController = {
     getAllTasks: (req: Request, res: Response): void => {
         db.all('SELECT * FROM tasks ORDER BY createdAt DESC', [], (err: Error | null, rows: Task[]) => {
             if (err) {
-                handleError(err, res);
+                handleError(err, res, 'get-all-tasks');
             } else {
+                logger.debug('All tasks retrieved for recap', { 
+                    count: rows.length,
+                    timestamp: new Date().toISOString()
+                });
                 res.render('task-recap', {
                     tasklist: rows,
                     pageTitle: 'Giornalino a puntini'
