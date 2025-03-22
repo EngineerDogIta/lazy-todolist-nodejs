@@ -4,12 +4,11 @@
     "storage": "./data/database.sqlite"
   },
   "production": {
-    "use_env_variable": "DATABASE_URL",
-    "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false
-      }
-    }
+    "dialect": "postgresql",
+    "host": "db",
+    "port": 5432,
+    "database": "lazy_todolist",
+    "username": "postgres",
+    "password": "postgres"
   }
 }
