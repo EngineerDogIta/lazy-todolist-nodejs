@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import { DataSource, DataSourceOptions } from "typeorm"
-import { Task } from "../entities/Task"
+import { Task } from "../models/Task"
 import path from 'path'
 
 const isProduction = process.env.NODE_ENV === 'production'
