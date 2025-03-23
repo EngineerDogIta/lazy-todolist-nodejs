@@ -1,14 +1,10 @@
+include ../mixins/task-mixin.pug
+
 if tasklist.length > 0
     .list-group
         each task in tasklist
-            .list-group-item.d-flex.justify-content-between.align-items-center.animate__animated.animate__fadeIn.task-item(data-testid=`todo-item-${task.id}`)
-                span.task-title(data-testid=`todo-title-${task.id}`) #{task.title}
-                form(action="/" method="post")
-                    input(type="hidden", name="taskId" value=task.id)
-                    input(type="hidden", name="action" value="delete")
-                    button.btn.btn-outline-danger.btn-sm(type="submit" title="Elimina" data-testid=`todo-delete-${task.id}`)
-                        i.fa.fa-trash.mr-1
-                        | Elimina
+            if !task.parentTask
+                +renderTask(task)
 else
     .empty-state
         i.fas.fa-clipboard-check.mb-3

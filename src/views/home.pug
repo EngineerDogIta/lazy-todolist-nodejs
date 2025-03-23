@@ -2,6 +2,10 @@ extends layouts/main-layout.pug
 
 block content
     .todo-container
+        if error
+            .alert.alert-danger.mb-4(role="alert")
+                i.fas.fa-exclamation-circle.mr-2
+                = error
         .todo-form
             h4.mb-4 
                 i.fas.fa-tasks.text-primary.mr-2
