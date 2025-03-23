@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add delete confirmation
     const deleteButtons = document.querySelectorAll('button[type="submit"]');
     deleteButtons.forEach(button => {
-        if (button.textContent.includes('Elimina')) {
+        if (button.textContent.includes('Delete')) {
             button.addEventListener('click', function(e) {
                 if (!confirm('Are you sure you want to delete this task?')) {
                     e.preventDefault();
@@ -23,4 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-}); 
+});
+
+// Function to toggle subtask form visibility
+function toggleSubtaskForm(taskId) {
+    const form = document.getElementById(`subtask-form-${taskId}`);
+    if (form) {
+        form.classList.toggle('d-none');
+        if (!form.classList.contains('d-none')) {
+            form.querySelector('input[name="taskText"]').focus();
+        }
+    }
+} 
