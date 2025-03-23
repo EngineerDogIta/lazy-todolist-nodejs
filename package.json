@@ -11,7 +11,8 @@
     "format": "prettier --write \"src/**/*.{ts,pug,css}\"",
     "test": "jest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "author": "Yar D'Onofrio",
   "license": "ISC",
@@ -23,7 +24,9 @@
     "morgan": "^1.10.0",
     "pg": "^8.11.3",
     "pug": "^3.0.3",
+    "reflect-metadata": "^0.2.1",
     "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.20",
     "winston": "^3.17.0"
   },
   "description": "A lazy todolist web app for lazy todoersss",
