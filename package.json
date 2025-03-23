@@ -9,7 +9,9 @@
     "build": "npm run clean && tsc && copyfiles \"src/views/**/*.pug\" \"src/public/**/*\" dist",
     "lint": "eslint src/ --ext .ts",
     "format": "prettier --write \"src/**/*.{ts,pug,css}\"",
-    "test": "jest"
+    "test": "jest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "author": "Yar D'Onofrio",
   "license": "ISC",
@@ -19,14 +21,15 @@
     "express": "^4.21.2",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
+    "pg": "^8.11.3",
     "pug": "^3.0.3",
     "sqlite3": "^5.1.7",
-    "pg": "^8.11.3",
     "winston": "^3.17.0"
   },
   "description": "A lazy todolist web app for lazy todoersss",
   "devDependencies": {
-    "@types/body-parser": "^1.19.5",
+    "@playwright/test": "^1.51.1",
+    "@types/body-parser": "^1.q19.5",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
     "@types/morgan": "^1.9.9",
