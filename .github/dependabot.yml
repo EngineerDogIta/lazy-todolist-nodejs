@@ -1,2 +1,47 @@
 version: 2
-updates: []  # Empty updates array disables all updates 
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "npm"
+      include: "scope"
+    # Group minor and patch updates together
+    groups:
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "@typescript-eslint/*"
+          - "@testing-library/*"
+          - "@playwright/*"
+          - "@vitest/*"
+      production-dependencies:
+        patterns:
+          - "express"
+          - "typeorm"
+          - "pg"
+          - "sqlite3"
+          - "winston"
+    # Limit number of open PRs
+    open-pull-requests-limit: 10
+    # Ignore certain packages or versions if needed
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci" 
