@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator, type Dialog } from '@playwright/test';
 
 const ERROR_MESSAGES = {
   TASK_NOT_FOUND: (text: string) => `Could not find task with text: ${text}`,
@@ -12,7 +12,7 @@ class TodoPage {
   private readonly addButton: Locator;
   private readonly refreshButton: Locator;
   private createdTaskIds: string[] = []; // Track created task IDs
-  private dialogHandler: ((dialog: any) => Promise<void>) | null = null;
+  private dialogHandler: ((dialog: Dialog) => Promise<void>) | null = null;
 
   constructor(private page: Page) {
     this.taskInput = page.locator('textarea#taskText');
@@ -20,29 +20,29 @@ class TodoPage {
     this.refreshButton = page.locator('[data-testid="refresh-button"]');
   }
 
-  async goto() {
+  async goto(): Promise<void> {
     await this.page.goto('http://localhost:8080');
     // Wait for the page to be fully loaded
     await this.page.waitForLoadState('networkidle');
   }
 
-  async refresh() {
+  async refresh(): Promise<void> {
     await this.refreshButton.click();
     // Wait for the page to reload
     await this.page.waitForLoadState('networkidle');
   }
 
-  private setupDialogHandler() {
+  private setupDialogHandler(): void {
     if (this.dialogHandler) {
       this.page.removeListener('dialog', this.dialogHandler);
     }
-    this.dialogHandler = async (dialog) => {
+    this.dialogHandler = async (dialog): Promise<void> => {
       await dialog.accept();
     };
     this.page.on('dialog', this.dialogHandler);
   }
 
-  async addTask(text: string) {
+  async addTask(text: string): Promise<void> {
     await this.taskInput.fill(text);
     
     // Wait for both the click and navigation
@@ -61,7 +61,7 @@ class TodoPage {
     await expect(this.getTaskTitle(text)).toBeVisible();
   }
 
-  async addSubtask(parentTaskText: string, subtaskText: string) {
+  async addSubtask(parentTaskText: string, subtaskText: string): Promise<void> {
     // Find the parent task container
     const parentTask = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${parentTaskText}")`, { timeout: 10000 });
     const parentTaskId = await parentTask.getAttribute('data-testid');
@@ -94,7 +94,7 @@ class TodoPage {
     await expect(this.getTaskTitle(subtaskText)).toBeVisible();
   }
 
-  async deleteTask(taskText: string) {
+  async deleteTask(taskText: string): Promise<void> {
     // Find the task container by its text and get its ID
     const taskElement = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${taskText}")`, { timeout: 10000 });
     const taskId = await taskElement.getAttribute('data-testid');
@@ -129,7 +129,7 @@ class TodoPage {
     await this.page.waitForSelector(`[data-testid="todo-title-${id}"]`, { state: 'detached', timeout: 10000 });
   }
 
-  async cleanup() {
+  async cleanup(): Promise<void> {
     // Delete all created tasks in reverse order
     for (const id of [...this.createdTaskIds].reverse()) {
       try {
@@ -162,7 +162,7 @@ class TodoPage {
     return this.page.locator(`[data-testid^="todo-title-"]:has-text("${text}")`);
   }
 
-  async toggleTaskCompletion(taskText: string) {
+  async toggleTaskCompletion(taskText: string): Promise<void> {
     // Find the task container by its text and get its ID
     const taskElement = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${taskText}")`, { timeout: 10000 });
     const taskId = await taskElement.getAttribute('data-testid');
