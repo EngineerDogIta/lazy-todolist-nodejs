@@ -1,6 +1,7 @@
 # Todo List Application Development Guidelines
 
 ## Table of Contents
+- [Intended Audience](#intended-audience)
 - [Overview](#overview)
 - [Core Features](#core-features)
 - [Development Rules](#development-rules)
@@ -8,10 +9,22 @@
 - [Performance Guidelines](#performance-guidelines)
 - [Error Prevention](#error-prevention)
 - [Database Schema](#database-schema)
+- [TODO & Future Improvements](#todo)
+
+## Intended Audience
+This document serves as a reference for:
+- Developers implementing todo list features
+- Code reviewers evaluating changes
+- Project managers tracking technical requirements
+- QA engineers validating implementations
 
 ## Overview
 
-This document outlines the development guidelines and rules for the hierarchical Todo List application. These guidelines ensure consistent development practices and maintain code quality across the project.
+This document outlines the development guidelines and rules for the hierarchical Todo List application. These guidelines ensure:
+- Consistent code quality across the project
+- Maintainable and scalable architecture
+- Reduced technical debt
+- Faster onboarding for new team members
 
 ## Core Features
 
@@ -35,6 +48,39 @@ This document outlines the development guidelines and rules for the hierarchical
    - Delete capability
    - Subtask counter
    - List refresh feature
+
+### Task Validation Rules
+- Title length: 3-255 characters
+- Allowed characters: alphanumeric, basic punctuation
+- No HTML/script injection
+- Examples:
+  ✅ "Complete project report"
+  ❌ "<script>alert(1)</script>"
+
+### Error Handling
+- Invalid input: Display inline validation message
+- Network failure: Retry mechanism with user feedback
+- Maximum depth reached: Clear warning with explanation
+
+### Task Types
+- Standalone: Top-level tasks with no parent
+- Child: Subtasks that belong to a parent task
+Example hierarchy:
+- Project Plan (standalone)
+  - Research (child)
+    - Market Analysis (child)
+
+## Technical Requirements
+- Browsers: Latest 2 versions of Chrome, Firefox, Safari, Edge
+- Mobile: iOS 14+, Android 10+
+- Minimum screen size: 320px width
+
+### Testing Requirements
+- Unit test coverage: >80%
+- E2E test scenarios:
+  - Task CRUD operations
+  - Nested task management
+  - Error handling
 
 ## Development Rules
 
@@ -72,6 +118,19 @@ This document outlines the development guidelines and rules for the hierarchical
    - ARIA labels for interactive elements
    - Minimum contrast ratio: 4.5:1
 
+### ARIA Implementation
+- Task items: role="listitem"
+- Buttons: aria-label="[action description]"
+- Status updates: aria-live="polite"
+- Focus management for nested tasks
+
+### Color Contrast
+- Primary text: 7:1 ratio
+- Secondary text: 4.5:1 ratio
+Example combinations:
+- Text #2c3e50 on #ffffff = 7.72:1 ✅
+- Text #6c757d on #f8f9fa = 3.28:1 ❌
+
 ## Code Organization
 
 ### CSS Structure
@@ -102,6 +161,34 @@ This document outlines the development guidelines and rules for the hierarchical
    - Follow BEM methodology
    - Use descriptive, functional names
    - Maintain consistent prefixing
+
+### BEM Examples
+✅ Good:
+.task-list {}
+.task-list__item {}
+.task-list__item--completed {}
+
+❌ Bad:
+.taskList {}
+.task_list__item-completed {}
+
+### Project Structure
+src/
+  components/
+    Task/
+      Task.tsx
+      Task.test.tsx
+      Task.styles.css
+  hooks/
+  utils/
+  types/
+
+### Component Documentation
+Required for each component:
+- Purpose
+- Props interface
+- Usage examples
+- Known limitations
 
 ### Component Rules
 
@@ -174,6 +261,18 @@ This document outlines the development guidelines and rules for the hierarchical
    - Fallback UI states
    - Recovery mechanisms
 
+### Input Sanitization
+- Strip HTML tags
+- Encode special characters
+- Validate UTF-8 encoding
+- Maximum length enforcement
+
+### Security Guidelines
+- CSRF protection on forms
+- XSS prevention in task content
+- Rate limiting: 100 requests/minute
+- Input validation on both client and server
+
 ## Database Schema
 
 ### Task Table Structure
@@ -201,6 +300,26 @@ CREATE TABLE tasks (
    - NOT NULL on required fields
    - Cascade delete for child tasks
    - Maximum depth validation
+
+## Branch Management
+- main: Production code
+- develop: Integration branch
+- feature/*: New features
+- hotfix/*: Emergency fixes
+
+### Code Review Checklist
+- Follows naming conventions
+- Implements error handling
+- Includes tests
+- Meets accessibility requirements
+- Performance impact considered
+
+## TODO & Future Improvements
+- Implement internationalization (i18n) support
+- Add query optimization for large datasets
+- Implement caching strategy
+- Define documentation update process
+- Add comprehensive troubleshooting guides
 
 ---
 
