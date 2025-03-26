@@ -1,45 +1,75 @@
 # Lazy TodoList
 
-A simple todo list application built with Node.js and Express.
+[![Node.js CI](https://github.com/yourusername/lazy-todolist-nodejs/actions/workflows/node.js.yml/badge.svg)](https://github.com/yourusername/lazy-todolist-nodejs/actions/workflows/node.js.yml)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
 
-## Project Structure
+A simple, efficient todo list application built with Node.js and Express. Perfect for personal task management with a clean, intuitive interface.
 
-- src/
-  - config/
-    - logger.ts         # Winston logger configuration
-    - database.ts       # SQLite database configuration
-  - controllers/        # Route controllers
-  - public/            # Static assets (CSS, JS, images)
-  - routes/            # Express routes
-  - views/             # Pug templates
-  - index.ts           # Application entry point
-- logs/                # Application logs
-- data/                # Database files
-- package.json         # Project dependencies and scripts
+## Table of Contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Development](#development)
+  - [Production](#production)
+- [Docker Deployment](#docker-deployment)
+- [Configuration](#configuration)
+- [Available Scripts](#available-scripts)
+- [Project Structure](#project-structure)
+- [Logging](#logging)
+- [Database](#database)
+- [Development Tools](#development-tools)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- ✨ Create, read, update, and delete todos
+- 🎨 Simple and intuitive interface
+- 💾 SQLite database for data persistence
+- 📝 Comprehensive logging system with Winston
+- ⚙️ Environment-specific configurations
+- 🛡️ Error handling and monitoring
+- 📊 Request logging with performance tracking
+- 🎯 Pug templating engine
+- 📘 TypeScript support
+- 🧹 ESLint and Prettier for code quality
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
+- Git
 
 ## Installation
 
 1. Clone the repository:
 
-```bash
-git clone https://github.com/yourusername/lazy-todolist-nodejs.git
-cd lazy-todolist-nodejs
-```
+   ```bash
+   git clone https://github.com/yourusername/lazy-todolist-nodejs.git
+   cd lazy-todolist-nodejs
+   ```
 
 2. Install dependencies:
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-## Development
+3. Create a `.env` file in the root directory (optional):
 
-Start the development server:
+   ```env
+   NODE_ENV=development
+   PORT=8080
+   ```
+
+## Usage
+
+### Development
+
+Start the development server with hot reloading:
 
 ```bash
 npm run dev
@@ -47,7 +77,7 @@ npm run dev
 
 The application will be available at `http://localhost:8080`
 
-## Production
+### Production
 
 To run the application in production mode:
 
@@ -59,7 +89,7 @@ NODE_ENV=production npm start
 
 The application can be deployed using Docker with PostgreSQL as the production database.
 
-### Prerequisites
+### Docker Prerequisites
 
 - Docker
 - Docker Compose
@@ -68,55 +98,61 @@ The application can be deployed using Docker with PostgreSQL as the production d
 
 1. Build and start the containers:
 
+   ```bash
+   docker-compose up --build
+   ```
+
+2. The application will be available at `http://localhost:8080`
+
+### Local Development with Docker
+
+For local development using Docker:
+
 ```bash
-docker-compose up --build
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
-The application will be available at `http://localhost:8080`
+## Configuration
 
 ### Environment Variables
 
-The following environment variables can be configured in the docker-compose.yml file:
+The following environment variables can be configured:
 
-- `DB_USER`: PostgreSQL username (default: postgres)
-- `DB_HOST`: PostgreSQL host (default: postgres)
-- `DB_NAME`: PostgreSQL database name (default: todolist)
-- `DB_PASSWORD`: PostgreSQL password (default: postgres)
-- `DB_PORT`: PostgreSQL port (default: 5432)
-
-### Development
-
-For local development, the application uses SQLite as the database. To run the application locally:
-
-```bash
-npm install
-npm run dev
-```
-
-The SQLite database will be created in the `data` directory.
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NODE_ENV` | Application environment | development |
+| `PORT` | Server port | 8080 |
+| `DB_USER` | PostgreSQL username | postgres |
+| `DB_HOST` | PostgreSQL host | postgres |
+| `DB_NAME` | PostgreSQL database name | todolist |
+| `DB_PASSWORD` | PostgreSQL password | postgres |
+| `DB_PORT` | PostgreSQL port | 5432 |
 
 ## Available Scripts
 
-- `npm start` - Start the production server
-- `npm run dev` - Start the development server with hot reload
-- `npm run build` - Build the application for production
-- `npm run clean` - Clean the dist directory
-- `npm run lint` - Run ESLint to check code style
-- `npm run format` - Format code using Prettier
-- `npm test` - Run tests
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start the production server |
+| `npm run dev` | Start the development server with hot reload |
+| `npm run build` | Build the application for production |
+| `npm run clean` | Clean the dist directory |
+| `npm run lint` | Run ESLint to check code style |
+| `npm run format` | Format code using Prettier |
+| `npm test` | Run tests |
 
-## Features
+## Project Structure
 
-- Create, read, update, and delete todos
-- Simple and intuitive interface
-- SQLite database for data persistence
-- Comprehensive logging system with Winston
-- Environment-specific configurations
-- Error handling and monitoring
-- Request logging with performance tracking
-- Pug templating engine
-- TypeScript support
-- ESLint and Prettier for code quality
+```text
+src/
+├── config/
+│   ├── logger.ts         # Winston logger configuration
+│   └── database.ts       # SQLite database configuration
+├── controllers/          # Route controllers
+├── public/              # Static assets (CSS, JS, images)
+├── routes/              # Express routes
+├── views/               # Pug templates
+└── index.ts             # Application entry point
+```
 
 ## Logging
 
@@ -152,12 +188,9 @@ SQLite database with automatic table creation:
 - Prettier for code formatting
 - Jest for testing
 
-## Environment Variables
-
-- `NODE_ENV` - Application environment (development/production)
-- `PORT` - Server port (default: 8080)
-
 ## Contributing
+
+We welcome contributions! Please follow these steps:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -165,6 +198,14 @@ SQLite database with automatic table creation:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Development Guidelines
+
+- Follow the existing code style
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting PR
+- Add meaningful commit messages
+
 ## License
 
-This project is licensed under the ISC License.
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.

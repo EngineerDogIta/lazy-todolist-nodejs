@@ -1,6 +1,7 @@
 # Todo List Application Development Guidelines
 
 ## Table of Contents
+
 - [Intended Audience](#intended-audience)
 - [Overview](#overview)
 - [Core Features](#core-features)
@@ -9,10 +10,12 @@
 - [Performance Guidelines](#performance-guidelines)
 - [Error Prevention](#error-prevention)
 - [Database Schema](#database-schema)
-- [TODO & Future Improvements](#todo)
+- [TODO & Future Improvements](#todo--future-improvements)
 
 ## Intended Audience
+
 This document serves as a reference for:
+
 - Developers implementing todo list features
 - Code reviewers evaluating changes
 - Project managers tracking technical requirements
@@ -21,6 +24,7 @@ This document serves as a reference for:
 ## Overview
 
 This document outlines the development guidelines and rules for the hierarchical Todo List application. These guidelines ensure:
+
 - Consistent code quality across the project
 - Maintainable and scalable architecture
 - Reduced technical debt
@@ -50,19 +54,22 @@ This document outlines the development guidelines and rules for the hierarchical
    - List refresh feature
 
 ### Task Validation Rules
+
 - Title length: 3-255 characters
 - Allowed characters: alphanumeric, basic punctuation
 - No HTML/script injection
 - Examples:
   ✅ "Complete project report"
-  ❌ "<script>alert(1)</script>"
+  ❌ "script tag with alert"
 
 ### Error Handling
+
 - Invalid input: Display inline validation message
 - Network failure: Retry mechanism with user feedback
 - Maximum depth reached: Clear warning with explanation
 
 ### Task Types
+
 - Standalone: Top-level tasks with no parent
 - Child: Subtasks that belong to a parent task
 Example hierarchy:
@@ -71,11 +78,13 @@ Example hierarchy:
     - Market Analysis (child)
 
 ## Technical Requirements
+
 - Browsers: Latest 2 versions of Chrome, Firefox, Safari, Edge
 - Mobile: iOS 14+, Android 10+
 - Minimum screen size: 320px width
 
 ### Testing Requirements
+
 - Unit test coverage: >80%
 - E2E test scenarios:
   - Task CRUD operations
@@ -119,12 +128,14 @@ Example hierarchy:
    - Minimum contrast ratio: 4.5:1
 
 ### ARIA Implementation
+
 - Task items: role="listitem"
 - Buttons: aria-label="[action description]"
 - Status updates: aria-live="polite"
 - Focus management for nested tasks
 
 ### Color Contrast
+
 - Primary text: 7:1 ratio
 - Secondary text: 4.5:1 ratio
 Example combinations:
@@ -136,6 +147,7 @@ Example combinations:
 ### CSS Structure
 
 1. **Variable Naming**
+
    ```css
    :root {
        /* Spacing */
@@ -163,6 +175,7 @@ Example combinations:
    - Maintain consistent prefixing
 
 ### BEM Examples
+
 ✅ Good:
 .task-list {}
 .task-list__item {}
@@ -173,6 +186,7 @@ Example combinations:
 .task_list__item-completed {}
 
 ### Project Structure
+
 src/
   config/           # Application configuration
     config.json     # Environment-specific settings
@@ -196,7 +210,9 @@ src/
   index.ts         # Application entry point
 
 ### Component Documentation
+
 Required for each component:
+
 - Purpose
 - Props interface
 - Usage examples
@@ -205,6 +221,7 @@ Required for each component:
 ### Component Rules
 
 1. **Task Component Structure**
+
    ```css
    .task {
        position: relative;
@@ -378,12 +395,14 @@ Required for each component:
    - Recovery mechanisms
 
 ### Input Sanitization
+
 - Strip HTML tags
 - Encode special characters
 - Validate UTF-8 encoding
 - Maximum length enforcement
 
 ### Security Guidelines
+
 - CSRF protection on forms
 - XSS prevention in task content
 - Rate limiting: 100 requests/minute
@@ -418,12 +437,14 @@ CREATE TABLE tasks (
    - Maximum depth validation
 
 ## Branch Management
+
 - main: Production code
 - develop: Integration branch
 - feature/*: New features
 - hotfix/*: Emergency fixes
 
 ### Code Review Checklist
+
 - Follows naming conventions
 - Implements error handling
 - Includes tests
@@ -431,6 +452,7 @@ CREATE TABLE tasks (
 - Performance impact considered
 
 ## TODO & Future Improvements
+
 - Implement internationalization (i18n) support
 - Add query optimization for large datasets
 - Implement caching strategy
@@ -500,6 +522,7 @@ CREATE TABLE tasks (
    - SystemError: Technical failures
 
 2. **Error Response Format**
+
    ```typescript
    interface ErrorResponse {
      code: string;
@@ -537,4 +560,4 @@ CREATE TABLE tasks (
 
 ---
 
-*Note: These guidelines should be reviewed and updated as the project evolves. All team members should follow these rules to maintain consistency and quality across the codebase.* 
+*Note: These guidelines should be reviewed and updated as the project evolves. All team members should follow these rules to maintain consistency and quality across the codebase.*
