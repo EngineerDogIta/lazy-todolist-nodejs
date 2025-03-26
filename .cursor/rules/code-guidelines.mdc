@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- Use the [DEVELOPMENT_GUIDELINES.md](mdc:DEVELOPMENT_GUIDELINES.md)

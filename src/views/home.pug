@@ -1,22 +1,46 @@
 extends layouts/main-layout.pug
 
 block content
-    .todo-container
+    .container-fluid.px-4
         if error
             .alert.alert-danger.mb-4(role="alert")
                 i.fas.fa-exclamation-circle.mr-2
                 = error
-        .todo-form
-            h4.mb-4 
-                i.fas.fa-tasks.text-primary.mr-2
-                | Compito da fare
-            form(action="/" method="post")
-                .input-group
-                    input.form-control(type="text" name="taskText" id="taskText" placeholder="Inserisci un nuovo compito..." required)
-                    .input-group-append
-                        button.btn.btn-primary(type="submit")
-                            i.fas.fa-plus.mr-2
-                            | Aggiungi
         
-        .todo-list.animate__animated.animate__fadeIn
-            include layouts/tasks-layout.pug
+        .row
+            // Left column - Scrollable task list
+            .col-md-8.task-list-column
+                .todo__header.d-flex.justify-content-between.align-items-center
+                    h4.todo__title.mb-0
+                        i.fas.fa-tasks.text-primary.mr-2
+                        | Compito da fare
+                    button.btn.btn-outline-primary.btn-sm(
+                        type="button"
+                        onclick="window.location.reload()"
+                        data-testid="refresh-button"
+                    )
+                        i.fas.fa-sync-alt.fa-fw
+                        span.ml-1 Refresh
+                
+                .todo__list.animate__animated.animate__fadeIn
+                    include layouts/tasks-layout.pug
+            
+            // Right column - New task input
+            .col-md-4.task-input-column
+                h4.todo__title
+                    i.fas.fa-plus-circle.text-primary.mr-2
+                    | Nuovo Task
+                .add-form.sticky-top
+                    form(action="/" method="post")
+                        .add-form__input-group
+                            textarea.form-control(
+                                name="taskText" 
+                                id="taskText" 
+                                placeholder="Inserisci un nuovo compito..." 
+                                required
+                                rows="3"
+                            )
+                            .add-form__button-container
+                                button.btn.btn-primary(type="submit")
+                                    i.fas.fa-plus.mr-2
+                                    | Aggiungi

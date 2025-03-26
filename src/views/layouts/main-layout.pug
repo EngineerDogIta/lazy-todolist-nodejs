@@ -6,31 +6,33 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="IE=7")
         link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh", crossorigin="anonymous")
         link(href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css", rel="stylesheet")
-        link(href="/css/custom.css", rel="stylesheet")
+        link(href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css", rel="stylesheet")
+        link(href="/css/enhanced-todo.css", rel="stylesheet")
         script(src="scripts/main.js")
-        script(src="https://kit.fontawesome.com/ac389a6c76.js" crossorigin="anonymous")
         title #{pageTitle}
     body.bg-light
-        nav.navbar.navbar-expand-lg.navbar-light.bg-white
+        nav.navbar.navbar-expand-lg.navbar-light.bg-white.mb-4
             .container
                 a.navbar-brand(href="/") 
                     i.fas.fa-check-double.text-primary.mr-2
                     | Todo List
                 .navbar-nav.ml-auto
                     a.nav-link.mx-2(href="/" title="Home")
-                        i.fas.fa-home
+                        i.fas.fa-home.fa-fw
                     a.nav-link.mx-2(href="/" title="Compiti")
-                        i.fas.fa-list
+                        i.fas.fa-list.fa-fw
                     a.nav-link.mx-2(href="/" title="Aggiungi")
-                        i.fas.fa-plus
+                        i.fas.fa-plus.fa-fw
         
-        .container.py-4
+        .container
             block content
 
-        footer.text-center.text-muted
+        footer.text-center.text-muted.mt-5
             .container
                 p.mb-0
-                    | Yari 2020 made with 😀 |
+                    | Yari EngineerDogIta 2025 made with 
+                    i.fas.fa-heart.text-danger.mx-1
+                    | |
                     a.text-decoration-none.ml-2(href='https://github.com/EngineerDogIta/lazy-todolist-nodejs')
-                        i.fab.fa-github.mr-1
+                        i.fab.fa-github.fa-fw.mr-1
                         | View Source

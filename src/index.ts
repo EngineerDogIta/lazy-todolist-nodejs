@@ -22,6 +22,7 @@ AppDataSource.initialize()
 
         // Middleware
         app.use(bodyParser.urlencoded({ extended: false }));
+        app.use(bodyParser.json());
         app.use(express.static(path.join(__dirname, process.env.NODE_ENV === 'production' ? 'src/public' : 'public')));
 
         // Request logging middleware

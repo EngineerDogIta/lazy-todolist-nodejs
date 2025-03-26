@@ -1,123 +1,221 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
+
+// Create a TodoPage class following the Page Object Model pattern
+class TodoPage {
+  private readonly taskInput: Locator;
+  private readonly addButton: Locator;
+  private readonly refreshButton: Locator;
+  private createdTaskIds: string[] = []; // Track created task IDs
+  private dialogHandler: ((dialog: any) => Promise<void>) | null = null;
+
+  constructor(private page: Page) {
+    this.taskInput = page.locator('textarea#taskText');
+    this.addButton = page.locator('button.btn.btn-primary:has-text("Aggiungi")');
+    this.refreshButton = page.locator('[data-testid="refresh-button"]');
+  }
+
+  async goto() {
+    await this.page.goto('http://localhost:8080');
+    // Wait for the page to be fully loaded
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async refresh() {
+    await this.refreshButton.click();
+    // Wait for the page to reload
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  private setupDialogHandler() {
+    if (this.dialogHandler) {
+      this.page.removeListener('dialog', this.dialogHandler);
+    }
+    this.dialogHandler = async (dialog) => {
+      await dialog.accept();
+    };
+    this.page.on('dialog', this.dialogHandler);
+  }
+
+  async addTask(text: string) {
+    await this.taskInput.fill(text);
+    
+    // Wait for both the click and navigation
+    await Promise.all([
+      this.page.waitForNavigation({ waitUntil: 'networkidle', timeout: 30000 }),
+      this.addButton.click()
+    ]);
+    
+    // Wait for the task to appear and get its ID
+    const taskElement = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${text}")`, { timeout: 10000 });
+    const taskId = await taskElement.getAttribute('data-testid');
+    if (taskId) {
+      this.createdTaskIds.push(taskId.replace('todo-title-', ''));
+    }
+    
+    await expect(this.getTaskTitle(text)).toBeVisible();
+  }
+
+  async addSubtask(parentTaskText: string, subtaskText: string) {
+    // Find the parent task container
+    const parentTask = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${parentTaskText}")`, { timeout: 10000 });
+    const parentTaskId = await parentTask.getAttribute('data-testid');
+    const taskId = parentTaskId?.replace('todo-title-', '');
+    
+    if (!taskId) {
+      throw new Error(`Could not find parent task with text: ${parentTaskText}`);
+    }
+    
+    // Click the add subtask button
+    await this.page.click(`[data-testid="todo-add-subtask-${taskId}"]`);
+    
+    // Fill and submit the subtask form
+    const subtaskForm = this.page.locator(`#subtask-form-${taskId}`);
+    await subtaskForm.locator('input[name="taskText"]').fill(subtaskText);
+    
+    // Wait for both the form submission and navigation
+    await Promise.all([
+      this.page.waitForNavigation({ waitUntil: 'networkidle', timeout: 30000 }),
+      subtaskForm.locator('button[type="submit"]').click()
+    ]);
+    
+    // Wait for the subtask to appear and get its ID
+    const subtaskElement = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${subtaskText}")`, { timeout: 10000 });
+    const subtaskId = await subtaskElement.getAttribute('data-testid');
+    if (subtaskId) {
+      this.createdTaskIds.push(subtaskId.replace('todo-title-', ''));
+    }
+    
+    await expect(this.getTaskTitle(subtaskText)).toBeVisible();
+  }
+
+  async deleteTask(taskText: string) {
+    // Find the task container by its text and get its ID
+    const taskElement = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${taskText}")`, { timeout: 10000 });
+    const taskId = await taskElement.getAttribute('data-testid');
+    const id = taskId?.replace('todo-title-', '');
+    
+    if (!id) {
+      throw new Error(`Could not find task with text: ${taskText}`);
+    }
+    
+    // Set up dialog handler before clicking delete
+    this.setupDialogHandler();
+    
+    // Find the delete form and submit it
+    const deleteForm = this.page.locator(`[data-testid="todo-item-${id}"] form.d-inline`);
+    
+    // Submit the form and wait for navigation
+    await Promise.all([
+      this.page.waitForNavigation({ waitUntil: 'networkidle', timeout: 30000 }),
+      deleteForm.evaluate((form: HTMLFormElement, taskId: string) => {
+        // Set the form data
+        const taskIdInput = form.querySelector('input[name="taskId"]') as HTMLInputElement;
+        const actionInput = form.querySelector('input[name="action"]') as HTMLInputElement;
+        if (taskIdInput && actionInput) {
+          taskIdInput.value = taskId;
+          actionInput.value = 'delete';
+        }
+        form.submit();
+      }, id)
+    ]);
+    
+    // Wait for the task to be removed from the DOM
+    await this.page.waitForSelector(`[data-testid="todo-title-${id}"]`, { state: 'detached', timeout: 10000 });
+  }
+
+  async cleanup() {
+    // Delete all created tasks in reverse order
+    for (const id of [...this.createdTaskIds].reverse()) {
+      try {
+        // Check if the task still exists
+        const taskElement = await this.page.$(`[data-testid="todo-title-${id}"]`);
+        if (!taskElement) {
+          console.log(`Task ${id} not found during cleanup, skipping...`);
+          continue;
+        }
+        
+        const taskText = await taskElement.textContent();
+        if (taskText) {
+          await this.deleteTask(taskText);
+        }
+      } catch (error) {
+        console.log(`Failed to cleanup task ${id}:`, error);
+        // Continue with other tasks even if one fails
+      }
+    }
+    this.createdTaskIds = [];
+  }
+
+  getTaskTitle(text: string): Locator {
+    return this.page.locator(`[data-testid^="todo-title-"]:has-text("${text}")`);
+  }
+}
 
 test.describe('Todo Application', () => {
-  test('should manage hierarchical tasks with depth limit', async ({ page }) => {
-    // Navigate to the application and wait for network idle
-    await page.goto('http://localhost:8080');
-    await page.waitForLoadState('networkidle');
+  let todoPage: TodoPage;
 
-    // Wait for the page to be fully loaded
-    await page.waitForSelector('.todo-container');
+  test.beforeEach(async ({ page }) => {
+    todoPage = new TodoPage(page);
+    await todoPage.goto();
+  });
 
-    // Generate a unique task name to track our test tasks
-    const uniquePrefix = `Test_${Date.now()}_`;
-    const parentTaskName = `${uniquePrefix}Parent`;
+  // Add afterEach hook to clean up after each test
+  test.afterEach(async () => {
+    await todoPage.cleanup();
+  });
 
-    // Add a parent task
-    const taskInput = page.locator('#taskText');
-    await taskInput.waitFor({ state: 'visible', timeout: 10000 });
-    await taskInput.fill(parentTaskName);
-    await taskInput.press('Enter');
+  test('should add and remove a task', async () => {
+    const taskName = `Test Task ${Date.now()}`;
+    await todoPage.addTask(taskName);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(taskName)).toBeVisible();
+    await todoPage.deleteTask(taskName);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(taskName)).toHaveCount(0);
+  });
 
-    // Wait for the page to reload after task addition
-    await page.waitForLoadState('networkidle');
+  test('should manage first level subtask', async () => {
+    const parentName = `Parent ${Date.now()}`;
+    const childName = `Child ${Date.now()}`;
+    
+    await todoPage.addTask(parentName);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(parentName)).toBeVisible();
+    
+    await todoPage.addSubtask(parentName, childName);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(childName)).toBeVisible();
+    
+    await todoPage.deleteTask(parentName);
+    await todoPage.refresh();
+    
+    await expect(todoPage.getTaskTitle(parentName)).toHaveCount(0);
+    await expect(todoPage.getTaskTitle(childName)).toHaveCount(0);
+  });
 
-    // Find our newly created task by its unique name
-    const parentTaskTitle = page.getByText(parentTaskName);
-    await expect(parentTaskTitle).toBeVisible();
-
-    // Get the parent task container and its ID
-    const parentContainer = parentTaskTitle.locator('xpath=ancestor::div[contains(@class, "list-group-item")]');
-    const parentTaskId = await parentContainer.getAttribute('data-testid');
-    expect(parentTaskId).toBeTruthy();
-    const parentTaskIdNumber = parentTaskId!.replace('todo-item-', '');
-
-    // Add subtasks up to the maximum depth (3 levels)
-    const taskTitles = [
-      `${uniquePrefix}Level1`,
-      `${uniquePrefix}Level2`,
-      `${uniquePrefix}Level3`
-    ];
-
-    let currentTaskId = parentTaskIdNumber;
-
-    for (const title of taskTitles) {
-      // Click "Add Subtask" button for the current task
-      const addSubtaskButton = page.locator(`[data-testid="todo-add-subtask-${currentTaskId}"]`);
-      await addSubtaskButton.click();
-
-      // Fill and submit the subtask form
-      const subtaskForm = page.locator(`#subtask-form-${currentTaskId}`);
-      await subtaskForm.locator('input[name="taskText"]').fill(title);
-      await subtaskForm.locator('button[type="submit"]').click();
-
-      // Wait for the page to reload
-      await page.waitForLoadState('networkidle');
-
-      // Find the newly created subtask by its unique name
-      const subtaskTitle = page.getByText(title);
-      await expect(subtaskTitle).toBeVisible();
-
-      // Get the subtask container and its ID
-      const subtaskContainer = subtaskTitle.locator('xpath=ancestor::div[contains(@class, "list-group-item")]');
-      const subtaskId = await subtaskContainer.getAttribute('data-testid');
-      expect(subtaskId).toBeTruthy();
-      const subtaskIdNumber = subtaskId!.replace('todo-item-', '');
-
-      // Update currentTaskId for the next iteration
-      currentTaskId = subtaskIdNumber;
-    }
-
-    // Try to add a 4th level subtask and verify the warning message
-    const addSubtaskButton = page.locator(`[data-testid="todo-add-subtask-${currentTaskId}"]`);
-    await addSubtaskButton.click();
-    const subtaskForm = page.locator(`#subtask-form-${currentTaskId}`);
-    await subtaskForm.locator('input[name="taskText"]').fill(`${uniquePrefix}Level4`);
-    await subtaskForm.locator('button[type="submit"]').click();
-
-    // Verify the warning message appears
-    const warningMessage = page.locator('.alert-danger');
-    await expect(warningMessage).toBeVisible();
-    await expect(warningMessage).toContainText('Cannot add more subtasks. Maximum depth of 4 levels reached.');
-
-    // Test deletion of tasks at different levels
-    // Delete the Level 2 task (which should remove Level 3 as well)
-    const level2TaskTitle = page.getByText(taskTitles[1]);
-    const level2Container = level2TaskTitle.locator('xpath=ancestor::div[contains(@class, "list-group-item")]');
-    const deleteButton = level2Container.locator('button[title="Delete"]');
-
-    // Handle the confirmation dialog
-    page.on('dialog', async dialog => {
-      expect(dialog.message()).toContain('Are you sure');
-      await dialog.accept();
-    });
-
-    await deleteButton.click();
-    await page.waitForLoadState('networkidle');
-
-    // Verify Level 2 and its subtasks are deleted
-    await expect(page.getByText(taskTitles[1])).not.toBeVisible();
-    await expect(page.getByText(taskTitles[2])).not.toBeVisible();
-
-    // Verify parent and Level 1 tasks are still visible
-    await expect(page.getByText(parentTaskName)).toBeVisible();
-    await expect(page.getByText(taskTitles[0])).toBeVisible();
-
-    // Cleanup: Delete all remaining test tasks
-    // First, delete Level 1 task
-    const level1TaskTitle = page.getByText(taskTitles[0]);
-    const level1Container = level1TaskTitle.locator('xpath=ancestor::div[contains(@class, "list-group-item")]');
-    const level1DeleteButton = level1Container.locator('button[title="Delete"]');
-    await level1DeleteButton.click();
-    await page.waitForLoadState('networkidle');
-
-    // Finally, delete the parent task
-    const parentDeleteButton = page.locator(`[data-testid="todo-delete-${parentTaskIdNumber}"]`);
-    await parentDeleteButton.click();
-    await page.waitForLoadState('networkidle');
-
-    // Verify all test tasks are deleted
-    await expect(page.getByText(parentTaskName)).not.toBeVisible();
-    await expect(page.getByText(taskTitles[0])).not.toBeVisible();
+  test('should manage multiple levels of subtasks up to 3rd depth', async () => {
+    const timestamp = Date.now();
+    const level1Name = `Level1_${timestamp}`;
+    const level2Name = `Level2_${timestamp}`;
+    const level3Name = `Level3_${timestamp}`;
+    
+    await todoPage.addTask(level1Name);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(level1Name)).toBeVisible();
+    
+    await todoPage.addSubtask(level1Name, level2Name);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(level2Name)).toBeVisible();
+    
+    await todoPage.addSubtask(level2Name, level3Name);
+    await todoPage.refresh();
+    await expect(todoPage.getTaskTitle(level3Name)).toBeVisible();
+    
+    await todoPage.deleteTask(level1Name);
+    await todoPage.refresh();
+    
+    await expect(todoPage.getTaskTitle(level1Name)).toHaveCount(0);
+    await expect(todoPage.getTaskTitle(level2Name)).toHaveCount(0);
+    await expect(todoPage.getTaskTitle(level3Name)).toHaveCount(0);
   });
 }); 

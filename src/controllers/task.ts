@@ -54,12 +54,36 @@ const taskController = {
                 if (isNaN(taskId)) {
                     throw new Error('Invalid task ID');
                 }
-                await taskRepository.delete(taskId);
+                
+                // First find the task to delete
+                const taskToDelete = await taskRepository.findOne({
+                    where: { id: taskId },
+                    relations: ['childTasks']
+                });
+                
+                if (!taskToDelete) {
+                    logger.warn('Attempted to delete non-existent task', { 
+                        taskId,
+                        timestamp: new Date().toISOString()
+                    });
+                    res.redirect('/');
+                    return;
+                }
+                
+                // Delete the task and wait for it to complete
+                await taskRepository.remove(taskToDelete);
+                
                 logger.info('Task deleted successfully', { 
                     taskId,
                     timestamp: new Date().toISOString()
                 });
-                res.redirect('/');
+                
+                // Send a JSON response for AJAX requests
+                if (req.xhr || req.headers.accept?.includes('application/json')) {
+                    res.json({ success: true });
+                } else {
+                    res.redirect('/');
+                }
                 return;
             }
 
