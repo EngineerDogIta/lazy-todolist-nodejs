@@ -1,5 +1,11 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
 
+const ERROR_MESSAGES = {
+  TASK_NOT_FOUND: (text: string) => `Could not find task with text: ${text}`,
+  PARENT_TASK_NOT_FOUND: (text: string) => `Could not find parent task with text: ${text}`,
+  CLEANUP_FAILED: (id: string, error: unknown) => `Failed to cleanup task ${id}: ${error instanceof Error ? error.message : String(error)}`
+} as const;
+
 // Create a TodoPage class following the Page Object Model pattern
 class TodoPage {
   private readonly taskInput: Locator;
@@ -62,7 +68,7 @@ class TodoPage {
     const taskId = parentTaskId?.replace('todo-title-', '');
     
     if (!taskId) {
-      throw new Error(`Could not find parent task with text: ${parentTaskText}`);
+      throw new Error(ERROR_MESSAGES.PARENT_TASK_NOT_FOUND(parentTaskText));
     }
     
     // Click the add subtask button
@@ -95,7 +101,7 @@ class TodoPage {
     const id = taskId?.replace('todo-title-', '');
     
     if (!id) {
-      throw new Error(`Could not find task with text: ${taskText}`);
+      throw new Error(ERROR_MESSAGES.TASK_NOT_FOUND(taskText));
     }
     
     // Set up dialog handler before clicking delete
@@ -130,7 +136,10 @@ class TodoPage {
         // Check if the task still exists
         const taskElement = await this.page.$(`[data-testid="todo-title-${id}"]`);
         if (!taskElement) {
-          console.log(`Task ${id} not found during cleanup, skipping...`);
+          test.info().annotations.push({
+            type: 'info',
+            description: `Task ${id} not found during cleanup, skipping...`
+          });
           continue;
         }
         
@@ -138,8 +147,11 @@ class TodoPage {
         if (taskText) {
           await this.deleteTask(taskText);
         }
-      } catch (error) {
-        console.log(`Failed to cleanup task ${id}:`, error);
+      } catch (error: unknown) {
+        test.info().annotations.push({
+          type: 'error',
+          description: ERROR_MESSAGES.CLEANUP_FAILED(id, error)
+        });
         // Continue with other tasks even if one fails
       }
     }
@@ -157,7 +169,7 @@ class TodoPage {
     const id = taskId?.replace('todo-title-', '');
     
     if (!id) {
-      throw new Error(`Could not find task with text: ${taskText}`);
+      throw new Error(ERROR_MESSAGES.TASK_NOT_FOUND(taskText));
     }
 
     // Click the task title to toggle completion

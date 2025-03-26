@@ -9,6 +9,25 @@ import taskRoutes from './routes/task';
 
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 
+const ERROR_MESSAGES = {
+  PAGE_NOT_FOUND: 'Page not found',
+  INTERNAL_ERROR: 'Something went wrong!',
+  RESOURCE_NOT_FOUND: 'Resource not found'
+} as const;
+
+interface ErrorResponse {
+  message: string;
+  error: Record<string, unknown>;
+}
+
+const createErrorResponse = (message: string, error?: unknown): ErrorResponse => ({
+  message,
+  error: error instanceof Error ? {
+    message: error.message,
+    ...(process.env.NODE_ENV === 'development' ? { stack: error.stack } : {})
+  } : {}
+});
+
 // Initialize TypeORM connection
 AppDataSource.initialize()
     .then(() => {
@@ -36,37 +55,33 @@ AppDataSource.initialize()
             logger.warn('404 Not Found', {
                 path: req.path,
                 method: req.method,
-                ip: req.ip
+                ip: req.ip,
+                timestamp: new Date().toISOString()
             });
-            res.status(404).render('error', {
-                message: 'Page not found',
-                error: {}
-            });
+            res.status(404).render('error', createErrorResponse(ERROR_MESSAGES.PAGE_NOT_FOUND));
         });
 
         // Error handling middleware
-        app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
+        app.use((err: unknown, req: Request, res: Response, next: NextFunction): void => {
             // Log the error
             logger.error('Unhandled error:', {
-                error: err.message,
-                stack: err.stack,
+                error: err instanceof Error ? err.message : String(err),
+                stack: err instanceof Error ? err.stack : undefined,
                 path: req.path,
                 method: req.method,
                 ip: req.ip,
-                userAgent: req.get('user-agent')
+                userAgent: req.get('user-agent'),
+                timestamp: new Date().toISOString()
             });
             
             // Check if it's a static file error
             if (req.path.startsWith('/scripts/') || req.path.startsWith('/css/') || req.path.startsWith('/images/')) {
-                res.status(404).send('Resource not found');
+                res.status(404).send(ERROR_MESSAGES.RESOURCE_NOT_FOUND);
                 return;
             }
             
             // Send error response for other errors
-            res.status(500).render('error', { 
-                message: 'Something went wrong!',
-                error: process.env.NODE_ENV === 'development' ? err : {}
-            });
+            res.status(500).render('error', createErrorResponse(ERROR_MESSAGES.INTERNAL_ERROR, err));
 
             // Pass error to next middleware if any
             next(err);
@@ -81,7 +96,11 @@ AppDataSource.initialize()
             });
         });
     })
-    .catch((error) => {
-        logger.error("Error during Data Source initialization:", error);
+    .catch((error: unknown) => {
+        logger.error("Error during Data Source initialization:", {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            timestamp: new Date().toISOString()
+        });
         process.exit(1);
     }); 

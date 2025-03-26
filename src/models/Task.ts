@@ -5,13 +5,13 @@ export class Task {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({ type: 'varchar' })
     title: string
 
-    @Column({ default: false })
+    @Column({ type: 'boolean', default: false })
     isCompleted: boolean
 
-    @Column({ default: 0 })
+    @Column({ type: 'int', default: 0 })
     depth: number
 
     @ManyToOne(() => Task, task => task.childTasks, { 
@@ -23,9 +23,9 @@ export class Task {
     @OneToMany(() => Task, task => task.parentTask)
     childTasks: Task[]
 
-    @CreateDateColumn({ name: 'created_at' })
+    @CreateDateColumn({ name: 'created_at', type: 'datetime' })
     createdAt: Date
 
-    @UpdateDateColumn({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
     updatedAt: Date
 } 

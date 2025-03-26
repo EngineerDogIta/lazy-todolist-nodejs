@@ -5,7 +5,13 @@ import logger from '../config/logger';
 
 const taskRepository = AppDataSource.getRepository(Task);
 
-const handleError = (err: Error, res: Response, context: string): void => {
+const MAX_DEPTH_ERROR = 'Maximum task depth exceeded';
+const INVALID_ID_ERROR = 'Invalid task ID';
+const TASK_NOT_FOUND_ERROR = 'Task not found';
+const MISSING_FIELDS_ERROR = 'Missing required fields';
+const PARENT_NOT_FOUND_ERROR = 'Parent task not found';
+
+const handleError = async (err: Error, res: Response, context: string): Promise<void> => {
     logger.error('Error occurred:', { 
         error: err.message, 
         stack: err.stack,
@@ -13,36 +19,34 @@ const handleError = (err: Error, res: Response, context: string): void => {
         timestamp: new Date().toISOString()
     });
 
-    // Check for specific error types
-    if (err.message === 'Maximum task depth exceeded') {
-        // Load tasks before rendering error
-        taskRepository
-            .createQueryBuilder('task')
-            .leftJoinAndSelect('task.childTasks', 'childTasks')
-            .leftJoinAndSelect('childTasks.childTasks', 'grandChildTasks')
-            .leftJoinAndSelect('grandChildTasks.childTasks', 'greatGrandChildTasks')
-            .leftJoinAndSelect('task.parentTask', 'parentTask')
-            .where('task.parentTask IS NULL')
-            .orderBy('task.createdAt', 'DESC')
-            .getMany()
-            .then(tasks => {
-                res.render('home', {
-                    tasklist: tasks,
-                    error: 'Cannot add more subtasks. Maximum depth of 4 levels reached.',
-                    pageTitle: 'Giornalino a puntini'
-                });
-            })
-            .catch(loadError => {
-                logger.error('Failed to load tasks for error page:', {
-                    error: loadError.message,
-                    context: 'error-page-task-load'
-                });
-                res.redirect('/');
+    if (err.message === MAX_DEPTH_ERROR) {
+        try {
+            const tasks = await taskRepository
+                .createQueryBuilder('task')
+                .leftJoinAndSelect('task.childTasks', 'childTasks')
+                .leftJoinAndSelect('childTasks.childTasks', 'grandChildTasks')
+                .leftJoinAndSelect('grandChildTasks.childTasks', 'greatGrandChildTasks')
+                .leftJoinAndSelect('task.parentTask', 'parentTask')
+                .where('task.parentTask IS NULL')
+                .orderBy('task.createdAt', 'DESC')
+                .getMany();
+
+            res.render('home', {
+                tasklist: tasks,
+                error: MAX_DEPTH_ERROR,
+                pageTitle: 'Giornalino a puntini'
             });
+        } catch (loadError) {
+            logger.error('Failed to load tasks for error page:', {
+                error: loadError instanceof Error ? loadError.message : String(loadError),
+                context: 'error-page-task-load'
+            });
+            res.redirect('/');
+        }
         return;
     }
 
-    res.redirect('/');
+    res.redirect('/error');
 };
 
 const taskController = {
@@ -52,7 +56,7 @@ const taskController = {
             if (req.body.action === 'delete' && req.body.taskId) {
                 const taskId = parseInt(req.body.taskId);
                 if (isNaN(taskId)) {
-                    throw new Error('Invalid task ID');
+                    throw new Error(INVALID_ID_ERROR);
                 }
                 
                 // First find the task to delete
@@ -62,12 +66,7 @@ const taskController = {
                 });
                 
                 if (!taskToDelete) {
-                    logger.warn('Attempted to delete non-existent task', { 
-                        taskId,
-                        timestamp: new Date().toISOString()
-                    });
-                    res.redirect('/');
-                    return;
+                    throw new Error(TASK_NOT_FOUND_ERROR);
                 }
                 
                 // Delete the task and wait for it to complete
@@ -91,7 +90,7 @@ const taskController = {
             if (req.body.action === 'toggle-completion' && req.body.taskId) {
                 const taskId = parseInt(req.body.taskId);
                 if (isNaN(taskId)) {
-                    throw new Error('Invalid task ID');
+                    throw new Error(INVALID_ID_ERROR);
                 }
 
                 const task = await taskRepository.findOne({
@@ -99,7 +98,7 @@ const taskController = {
                 });
 
                 if (!task) {
-                    throw new Error('Task not found');
+                    throw new Error(TASK_NOT_FOUND_ERROR);
                 }
 
                 task.isCompleted = !task.isCompleted;
@@ -117,7 +116,7 @@ const taskController = {
             if (req.body.action === 'add-subtask') {
                 const { taskText, parentId } = req.body;
                 if (!taskText || !parentId) {
-                    throw new Error('Missing required fields');
+                    throw new Error(MISSING_FIELDS_ERROR);
                 }
 
                 const parentTask = await taskRepository
@@ -129,7 +128,7 @@ const taskController = {
                     .getOne();
 
                 if (!parentTask) {
-                    throw new Error('Parent task not found');
+                    throw new Error(PARENT_NOT_FOUND_ERROR);
                 }
 
                 // Calculate actual depth by counting parents
@@ -141,12 +140,12 @@ const taskController = {
                 }
 
                 if (depth >= 4) {
-                    logger.warn('Attempted to exceed maximum task depth', {
-                        parentTaskId: parentId,
+                    logger.error('Attempted to exceed maximum task depth', {
+                        parentTaskId: parentId, 
                         calculatedDepth: depth,
                         timestamp: new Date().toISOString()
                     });
-                    throw new Error('Maximum task depth exceeded');
+                    throw new Error(MAX_DEPTH_ERROR);
                 }
 
                 const task = new Task();
@@ -186,9 +185,16 @@ const taskController = {
                 timestamp: new Date().toISOString()
             });
             res.redirect('/');
-        } catch (err) {
+        } catch (err: unknown) {
             if (err instanceof Error) {
-                handleError(err, res, 'create-task');
+                await handleError(err, res, 'create-task');
+            } else {
+                logger.error('Unknown error occurred', { 
+                    err,
+                    context: 'create-task',
+                    timestamp: new Date().toISOString()
+                });
+                res.redirect('/error');
             }
         }
     },
@@ -213,9 +219,16 @@ const taskController = {
                 });
                 res.redirect('/error');
             }
-        } catch (err) {
+        } catch (err: unknown) {
             if (err instanceof Error) {
                 handleError(err, res, 'get-add-task');
+            } else {
+                logger.error('Unknown error occurred', {
+                    err, 
+                    context: 'get-add-task',
+                    timestamp: new Date().toISOString()  
+                });
+                res.redirect('/error');
             }
         }
     },
