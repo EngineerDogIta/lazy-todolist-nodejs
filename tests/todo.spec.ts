@@ -149,6 +149,27 @@ class TodoPage {
   getTaskTitle(text: string): Locator {
     return this.page.locator(`[data-testid^="todo-title-"]:has-text("${text}")`);
   }
+
+  async toggleTaskCompletion(taskText: string) {
+    // Find the task container by its text and get its ID
+    const taskElement = await this.page.waitForSelector(`[data-testid^="todo-title-"]:has-text("${taskText}")`, { timeout: 10000 });
+    const taskId = await taskElement.getAttribute('data-testid');
+    const id = taskId?.replace('todo-title-', '');
+    
+    if (!id) {
+      throw new Error(`Could not find task with text: ${taskText}`);
+    }
+
+    // Click the task title to toggle completion
+    await taskElement.click();
+    
+    // Wait for the completion state to update
+    await this.page.waitForResponse(response => 
+      response.url() === 'http://localhost:8080/' && 
+      response.request().method() === 'POST' &&
+      response.status() === 200
+    );
+  }
 }
 
 test.describe('Todo Application', () => {
@@ -217,5 +238,73 @@ test.describe('Todo Application', () => {
     await expect(todoPage.getTaskTitle(level1Name)).toHaveCount(0);
     await expect(todoPage.getTaskTitle(level2Name)).toHaveCount(0);
     await expect(todoPage.getTaskTitle(level3Name)).toHaveCount(0);
+  });
+
+  test('should toggle task completion status', async () => {
+    const taskName = `Test Task ${Date.now()}`;
+    
+    // Add a task
+    await todoPage.addTask(taskName);
+    await todoPage.refresh();
+    
+    // Get the task element
+    const taskElement = todoPage.getTaskTitle(taskName);
+    await expect(taskElement).toBeVisible();
+    
+    // Initially, the task should not be completed
+    await expect(taskElement).not.toHaveClass(/task__title--completed/);
+    
+    // Toggle completion
+    await todoPage.toggleTaskCompletion(taskName);
+    await expect(taskElement).toHaveClass(/task__title--completed/);
+    
+    // Toggle back to incomplete
+    await todoPage.toggleTaskCompletion(taskName);
+    await expect(taskElement).not.toHaveClass(/task__title--completed/);
+  });
+
+  test('should persist task completion status after refresh', async () => {
+    const taskName = `Test Task ${Date.now()}`;
+    
+    // Add a task
+    await todoPage.addTask(taskName);
+    await todoPage.refresh();
+    
+    // Toggle completion
+    await todoPage.toggleTaskCompletion(taskName);
+    
+    // Refresh the page
+    await todoPage.refresh();
+    
+    // Verify the completion status persists
+    const taskElement = todoPage.getTaskTitle(taskName);
+    await expect(taskElement).toHaveClass(/task__title--completed/);
+  });
+
+  test('should handle completion status for subtasks', async () => {
+    const parentName = `Parent ${Date.now()}`;
+    const childName = `Child ${Date.now()}`;
+    
+    // Create parent and child tasks
+    await todoPage.addTask(parentName);
+    await todoPage.refresh();
+    await todoPage.addSubtask(parentName, childName);
+    await todoPage.refresh();
+    
+    // Toggle completion for both tasks
+    await todoPage.toggleTaskCompletion(parentName);
+    await todoPage.toggleTaskCompletion(childName);
+    
+    // Verify both tasks are marked as completed
+    const parentElement = todoPage.getTaskTitle(parentName);
+    const childElement = todoPage.getTaskTitle(childName);
+    
+    await expect(parentElement).toHaveClass(/task__title--completed/);
+    await expect(childElement).toHaveClass(/task__title--completed/);
+    
+    // Refresh and verify status persists
+    await todoPage.refresh();
+    await expect(parentElement).toHaveClass(/task__title--completed/);
+    await expect(childElement).toHaveClass(/task__title--completed/);
   });
 }); 

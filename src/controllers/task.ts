@@ -87,6 +87,32 @@ const taskController = {
                 return;
             }
 
+            // Handle toggle completion action
+            if (req.body.action === 'toggle-completion' && req.body.taskId) {
+                const taskId = parseInt(req.body.taskId);
+                if (isNaN(taskId)) {
+                    throw new Error('Invalid task ID');
+                }
+
+                const task = await taskRepository.findOne({
+                    where: { id: taskId }
+                });
+
+                if (!task) {
+                    throw new Error('Task not found');
+                }
+
+                task.isCompleted = !task.isCompleted;
+                await taskRepository.save(task);
+
+                if (req.xhr || req.headers.accept?.includes('application/json')) {
+                    res.json({ success: true });
+                } else {
+                    res.redirect('/');
+                }
+                return;
+            }
+
             // Handle add subtask action
             if (req.body.action === 'add-subtask') {
                 const { taskText, parentId } = req.body;

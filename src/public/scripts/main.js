@@ -22,4 +22,28 @@ function toggleSubtaskForm(taskId) {
             form.querySelector('input[name="taskText"]').focus();
         }
     }
+}
+
+async function toggleTaskCompletion(taskId) {
+    try {
+        const response = await fetch('/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                taskId: taskId,
+                action: 'toggle-completion'
+            })
+        });
+
+        if (response.ok) {
+            const taskTitle = document.querySelector(`[data-testid="todo-title-${taskId}"]`);
+            taskTitle.classList.toggle('task__title--completed');
+            taskTitle.setAttribute('aria-checked', taskTitle.classList.contains('task__title--completed'));
+        }
+    } catch (error) {
+        console.error('Error toggling task completion:', error);
+    }
 } 

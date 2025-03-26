@@ -4,7 +4,13 @@ mixin renderTask(task)
     class=`task--depth-${task.depth}`
   )
     .task__content
-      span.task__title(data-testid=`todo-title-${task.id}`) #{task.title}
+      span.task__title(
+        data-testid=`todo-title-${task.id}`
+        class=task.isCompleted ? 'task__title--completed' : ''
+        onclick=`toggleTaskCompletion(${task.id})`
+        role="checkbox"
+        aria-checked=task.isCompleted
+      ) #{task.title}
     .task__actions
       if task.childTasks && task.childTasks.length > 0
         span.task__counter #{task.childTasks.length}

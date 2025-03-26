@@ -8,6 +8,9 @@ export class Task {
     @Column()
     title: string
 
+    @Column({ default: false })
+    isCompleted: boolean
+
     @Column({ default: 0 })
     depth: number
 

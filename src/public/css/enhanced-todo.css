@@ -140,6 +140,13 @@
     font-size: 0.925rem;
     color: var(--color-text);
     line-height: 1.2;
+    cursor: pointer;
+    transition: color var(--transition-speed) ease;
+}
+
+.task__title--completed {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
 }
 
 .task__counter {
