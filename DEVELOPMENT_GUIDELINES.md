@@ -174,14 +174,26 @@ Example combinations:
 
 ### Project Structure
 src/
-  components/
-    Task/
-      Task.tsx
-      Task.test.tsx
-      Task.styles.css
-  hooks/
-  utils/
-  types/
+  config/           # Application configuration
+    config.json     # Environment-specific settings
+    logger.ts       # Logging configuration
+    typeorm.config.ts # Database configuration
+  controllers/      # Request handlers
+    task.ts        # Task-related business logic
+  models/          # Data models
+    Task.ts        # Task entity definition
+  public/          # Static assets
+    css/           # Stylesheets
+    js/            # Client-side scripts
+    images/        # Image assets
+  routes/          # Route definitions
+    task.ts        # Task-related routes
+  views/           # Pug templates
+    layouts/       # Layout templates
+    mixins/        # Reusable template mixins
+    home.pug       # Main page template
+    error.pug      # Error page template
+  index.ts         # Application entry point
 
 ### Component Documentation
 Required for each component:
@@ -208,6 +220,110 @@ Required for each component:
    - Maximum depth: 4 levels
    - Visual indicators per level
    - Consistent indentation
+
+### Template Guidelines
+
+1. **Pug Template Structure**
+   - Use layouts for common elements
+   - Implement mixins for reusable components
+   - Keep templates DRY (Don't Repeat Yourself)
+   - Use semantic class names matching BEM
+
+2. **Template Organization**
+   - Place page templates in root of views/
+   - Group related templates in subdirectories
+   - Use descriptive filenames (e.g., task-list.pug)
+   - Keep templates focused and single-purpose
+
+3. **Template Best Practices**
+   - Use proper indentation (2 spaces)
+   - Include error handling blocks
+   - Implement responsive design classes
+   - Add data-testid attributes for testing
+
+4. **Mixin Usage**
+   - Create mixins for repeated patterns
+   - Keep mixins in dedicated directory
+   - Document mixin parameters
+   - Use mixins for complex components
+
+### Controller Guidelines
+
+1. **Controller Organization**
+   - One controller per domain entity
+   - Keep controllers focused and single-purpose
+   - Implement proper error handling
+   - Use TypeScript types for request/response
+
+2. **Controller Best Practices**
+   - Validate input before processing
+   - Use async/await for database operations
+   - Implement proper error responses
+   - Keep business logic in controllers
+
+3. **Error Handling**
+   - Use consistent error response format
+   - Log errors appropriately
+   - Provide user-friendly error messages
+   - Handle edge cases gracefully
+
+4. **Type Safety**
+   - Define interfaces for request/response
+   - Use TypeORM decorators properly
+   - Validate data types
+   - Handle null/undefined cases
+
+### Configuration Management
+
+1. **Environment Configuration**
+   - Use config.json for environment settings
+   - Keep sensitive data in environment variables
+   - Document all configuration options
+   - Use TypeScript for type safety
+
+2. **Logging Configuration**
+   - Implement structured logging
+   - Use appropriate log levels
+   - Include request IDs for tracing
+   - Configure log rotation
+
+3. **Database Configuration**
+   - Use TypeORM configuration file
+   - Document connection settings
+   - Implement migration strategy
+   - Handle connection errors
+
+4. **Security Configuration**
+   - Configure CORS properly
+   - Set up security headers
+   - Implement rate limiting
+   - Use secure session management
+
+### Testing Guidelines
+
+1. **Test Organization**
+   - Place tests next to source files
+   - Use descriptive test names
+   - Group related tests
+   - Follow AAA pattern (Arrange, Act, Assert)
+
+2. **E2E Testing**
+   - Use Playwright for browser tests
+   - Implement Page Object Model
+   - Test critical user flows
+   - Handle cleanup properly
+
+3. **Test Coverage**
+   - Aim for >80% coverage
+   - Focus on business logic
+   - Test error cases
+   - Include edge cases
+
+4. **Test Data Management**
+   - Use fixtures for test data
+   - Clean up after tests
+   - Use unique identifiers
+   - Handle async operations
 
 ## Performance Guidelines
 
