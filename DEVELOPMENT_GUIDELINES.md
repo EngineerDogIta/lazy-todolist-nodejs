@@ -437,6 +437,104 @@ CREATE TABLE tasks (
 - Define documentation update process
 - Add comprehensive troubleshooting guides
 
+### Service Layer Guidelines
+
+1. **Service Organization**
+   - Create services for complex business logic
+   - Keep controllers thin, services thick
+   - One service per domain entity
+   - Use dependency injection
+
+2. **Service Responsibilities**
+   - Handle business logic
+   - Manage data transformations
+   - Implement validation rules
+   - Handle complex queries
+
+3. **Service Best Practices**
+   - Use TypeScript interfaces
+   - Implement proper error handling
+   - Keep methods focused
+   - Document public methods
+
+### API Design Guidelines
+
+1. **RESTful Endpoints**
+   - Use proper HTTP methods
+   - Follow resource naming conventions
+   - Implement proper status codes
+   - Version APIs when needed
+
+2. **API Documentation**
+   - Document all endpoints
+   - Include request/response examples
+   - Document error responses
+   - Keep documentation up to date
+
+3. **API Security**
+   - Implement proper authentication
+   - Use HTTPS
+   - Validate all inputs
+   - Rate limit endpoints
+
+### State Management
+
+1. **Client-Side State**
+   - Use local storage for persistence
+   - Implement optimistic updates
+   - Handle offline scenarios
+   - Manage loading states
+
+2. **Server-Side State**
+   - Use proper caching
+   - Implement session management
+   - Handle concurrent updates
+   - Maintain data consistency
+
+### Error Handling Patterns
+
+1. **Error Types**
+   - ValidationError: Input validation failures
+   - NotFoundError: Resource not found
+   - BusinessError: Business rule violations
+   - SystemError: Technical failures
+
+2. **Error Response Format**
+   ```typescript
+   interface ErrorResponse {
+     code: string;
+     message: string;
+     details?: any;
+     timestamp: string;
+   }
+   ```
+
+3. **Error Handling Strategy**
+   - Log all errors
+   - Return appropriate status codes
+   - Provide user-friendly messages
+   - Handle edge cases
+
+### When to Add Complexity
+
+1. **Keep It Simple**
+   - Start with basic implementation
+   - Add features incrementally
+   - Avoid premature optimization
+   - Focus on core functionality
+
+2. **When to Add Components**
+   - Business logic becomes complex
+   - Code duplication occurs
+   - Testing becomes difficult
+   - Maintenance becomes challenging
+
+3. **When to Add Services**
+   - Business logic spans multiple controllers
+   - Complex data transformations needed
+   - External service integration required
+   - Complex validation rules needed
+
 ---
 
 *Note: These guidelines should be reviewed and updated as the project evolves. All team members should follow these rules to maintain consistency and quality across the codebase.* 
