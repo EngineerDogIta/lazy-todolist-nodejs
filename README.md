@@ -1,8 +1,7 @@
 # Lazy TodoList
 
-[![Node.js CI](https://github.com/yourusername/lazy-todolist-nodejs/actions/workflows/node.js.yml/badge.svg)](https://github.com/yourusername/lazy-todolist-nodejs/actions/workflows/node.js.yml)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
 
 A simple, efficient todo list application built with Node.js and Express. Perfect for personal task management with a clean, intuitive interface.
 
