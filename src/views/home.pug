@@ -13,7 +13,7 @@ block content
                 .todo__header.d-flex.justify-content-between.align-items-center
                     h4.todo__title.mb-0
                         i.fas.fa-tasks.text-primary.mr-2
-                        | Compito da fare
+                        | Tasks
                     button.btn.btn-outline-primary.btn-sm(
                         type="button"
                         onclick="window.location.reload()"
@@ -29,7 +29,12 @@ block content
             .col-md-4.task-input-column
                 h4.todo__title
                     i.fas.fa-plus-circle.text-primary.mr-2
-                    | Nuovo Task
+                    | New Boring manually written task
+                p.text-muted.mb-3
+                    | This is the boring way to write a task.
+                    | Don't use it.
+                    | The Carpal tunnel syndrome will be on your side.
+                    | Tendinopathy too.
                 .add-form.sticky-top
                     form(action="/" method="post")
                         .add-form__input-group
@@ -44,3 +49,27 @@ block content
                                 button.btn.btn-primary(type="submit")
                                     i.fas.fa-plus.mr-2
                                     | Aggiungi
+                // AI Task Generation Section
+                .ai-task-generator.mt-4
+                    h4.todo__title
+                        i.fas.fa-robot.text-primary.mr-2
+                        | AI Task Generator
+                    p.text-muted.mb-3
+                        | This robot will do everything for me now.
+                        | Robot, Activate yourself and generate tasks for me!
+                    form(action="/generate-tasks" method="post")
+                        .add-form__input-group
+                            textarea.form-control(
+                                name="taskPrompt" 
+                                id="taskPrompt" 
+                                placeholder="Describe your task in natural language..." 
+                                required
+                                rows="3"
+                            )
+                            .add-form__button-container
+                                button.btn.btn-primary.mr-2(type="submit" disabled id="generateTasksBtn")
+                                    i.fas.fa-magic.mr-2
+                                    | Generate Tasks
+                                button.btn.btn-secondary(type="button" disabled id="generatePromptBtn" onclick="generateRandomPrompt()")
+                                    i.fas.fa-ellipsis-h.mr-2 
+                                    | Generate Prompt
