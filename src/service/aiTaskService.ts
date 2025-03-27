@@ -1,56 +1,63 @@
 import { Task } from '../models/Task';
 import logger from '../config/logger';
+import ollama from 'ollama';
 
 export class AITaskService {
     // Placeholder for actual LLM integration
     async generateTasksFromPrompt(prompt: string): Promise<Task[]> {
         logger.info('Generating tasks from prompt', { prompt });
-        // TODO: Implement actual LLM integration
         
-        // Map the generated tasks to the Task model
+        // Implement actual LLM integration
+        try {
+            const systemPrompt = `You are a task breakdown assistant. Given a high-level task or goal, break it down into 3-5 logical subtasks. 
+            Format your response as a JSON array of tasks, where each task has a 'title' property. Example:
+            [
+                {"title": "Main task"},
+                {"title": "Subtask 1"},
+                {"title": "Subtask 2"}
+            ]`;
 
-        // Create the task objects
-        const tasks: Task[] = [];
-        const getUniqueId = () => `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        
-        const task = new Task();
-        task.title = `Example task from AI (${getUniqueId()})`;
-        task.isCompleted = false;
-        tasks.push(task);
+            const response = await ollama.chat({
+                model: 'gemma3:4b', // or your preferred model
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: prompt }
+                ],
+            });
 
-        const task2 = new Task();
-        task2.title = `Example task 2 from AI (${getUniqueId()})`;
-        task2.isCompleted = false;
-        tasks.push(task2);
+            // Parse the JSON response
+            const generatedTasks = JSON.parse(response.message.content);
+            logger.info('Generated tasks from LLM', { generatedTasks });
 
-        const task3 = new Task();
-        task3.title = `Example task 3 from AI (${getUniqueId()})`;
-        task3.isCompleted = false;
-        tasks.push(task3);
+            // Convert generated tasks to Task entities
+            const tasks: Task[] = [];
 
-        const task4 = new Task();
-        task4.title = `Example task 4 from AI (${getUniqueId()})`;
-        task4.isCompleted = false;
-        tasks.push(task4);
+            // Create Task entities from generated tasks
+            for (const generatedTask of generatedTasks) {
+                const task = new Task();
+                task.title = generatedTask.title;
+                task.isCompleted = false;
+                task.depth = 0;
+                tasks.push(task);
+            }
 
-        const task5 = new Task();
-        task5.title = `Example task 5 from AI (${getUniqueId()})`;
-        task5.isCompleted = false;
-        tasks.push(task5);
+            // If we have tasks, set up parent-child relationships
+            if (tasks.length > 0) {
+                const rootTask = tasks[0];
+                rootTask.depth = 0;
 
-        // Define the root task, it is always the first task
-        const rootTask = task;
-        
-        // Assign the parentTask attribute to the tasks
-        // Assign first last child task to the root task
-        task3.parentTask = task2;
-        task2.parentTask = rootTask
-
-        task4.parentTask = rootTask;
-        task5.parentTask = rootTask;
-
-        // Return the tasks
-        return tasks;
+                // Make remaining tasks children of root task
+                for (let i = 1; i < tasks.length; i++) {
+                    tasks[i].parentTask = rootTask;
+                    tasks[i].depth = 1; // Fixed depth of 1 for all subtasks
+                }
+            }
+            // Return the tasks
+            return tasks;
+        } catch (error) {
+            logger.error('Error generating tasks from prompt', { error });
+            throw error;
+        }
     }
 
     async generateRandomPrompt(): Promise<string> {
