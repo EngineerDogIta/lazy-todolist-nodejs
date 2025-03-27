@@ -9,16 +9,24 @@ export class AITaskService {
         
         // Implement actual LLM integration
         try {
-            const systemPrompt = `You are a task breakdown assistant. Given a high-level task or goal, break it down into 3-5 logical subtasks. 
-            Format your response as a JSON array of tasks, where each task has a 'title' property. Example:
-            [
-                {"title": "Main task"},
-                {"title": "Subtask 1"},
-                {"title": "Subtask 2"}
-            ]`;
+            const systemPrompt = `You are a JSON task generator. Always respond with a valid JSON array of tasks.
+Rules:
+- First task is the main task
+- Include 2-4 subtasks
+- Each task must only have a "title" property
+- Titles should be clear and actionable
+- No explanation, only JSON
+
+Example output:
+[
+    {"title": "Learn TypeScript Fundamentals"},
+    {"title": "Study Basic Types and Syntax"},
+    {"title": "Practice with Simple Projects"},
+    {"title": "Review Type System Concepts"}
+]`;
 
             const response = await ollama.chat({
-                model: 'gemma3:4b', // or your preferred model
+                model: 'mistral', // or your preferred model
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: prompt }
@@ -56,6 +64,10 @@ export class AITaskService {
             return tasks;
         } catch (error) {
             logger.error('Error generating tasks from prompt', { error });
+            // Add specific error message for Ollama connection issues
+            if (error instanceof Error && error.message.includes('fetch failed')) {
+                throw new Error('Ollama service is not running. Please start the Ollama service and try again.');
+            }
             throw error;
         }
     }

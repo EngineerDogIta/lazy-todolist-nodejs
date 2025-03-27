@@ -239,30 +239,20 @@ const taskController = {
             const tasks = await taskRepository
                 .createQueryBuilder('task')
                 .leftJoinAndSelect('task.childTasks', 'childTasks')
-                .leftJoinAndSelect('childTasks.childTasks', 'grandChildTasks')
-                .leftJoinAndSelect('grandChildTasks.childTasks', 'greatGrandChildTasks')
-                .leftJoinAndSelect('task.parentTask', 'parentTask')
                 .where('task.parentTask IS NULL')
                 .orderBy('task.createdAt', 'DESC')
                 .getMany();
-            
-            logger.debug('Tasks retrieved for home page', { 
-                count: tasks.length,
-                timestamp: new Date().toISOString()
-            });
 
-            // Get error message from query params if it exists
+            // Get error from query params if it exists
             const error = req.query.error ? decodeURIComponent(req.query.error as string) : null;
 
             res.render('home', {
                 tasklist: tasks,
-                pageTitle: 'Giornalino a puntini',
-                error: error
+                error: error,
+                pageTitle: 'Todo List'
             });
         } catch (err) {
-            if (err instanceof Error) {
-                handleError(err, res, 'get-home-tasks');
-            }
+            handleError(err instanceof Error ? err : new Error(String(err)), res, 'get-home-tasks');
         }
     },
 
@@ -306,7 +296,7 @@ const taskController = {
             res.redirect('/');
         } catch (err) {
             if (err instanceof Error) {
-                await handleError(err, res, 'generate-tasks');
+                res.redirect(`/?error=${encodeURIComponent(err.message)}`);
             }
         }
     },
