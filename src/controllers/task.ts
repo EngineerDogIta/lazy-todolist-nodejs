@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/typeorm.config';
 import { Task } from '../models/Task';
 import logger from '../config/logger';
+import { aiTaskService } from '../service/aiTaskService';
 
 const taskRepository = AppDataSource.getRepository(Task);
 
@@ -284,6 +285,46 @@ const taskController = {
         } catch (err) {
             if (err instanceof Error) {
                 handleError(err, res, 'get-all-tasks');
+            }
+        }
+    },
+
+    generateTasks: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { taskPrompt } = req.body;
+            if (!taskPrompt) {
+                throw new Error('Task prompt is required');
+            }
+
+            const generatedTasks = await aiTaskService.generateTasksFromPrompt(taskPrompt);
+            
+            // Create tasks from the generated suggestions
+            for (const taskText of generatedTasks) {
+                const task = new Task();
+                task.title = taskText;
+                task.depth = 0;
+                await taskRepository.save(task);
+            }
+
+            res.redirect('/');
+        } catch (err) {
+            if (err instanceof Error) {
+                await handleError(err, res, 'generate-tasks');
+            }
+        }
+    },
+
+    getRandomPrompt: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const prompt = await aiTaskService.generateRandomPrompt();
+            res.json({ prompt });
+        } catch (err) {
+            if (err instanceof Error) {
+                logger.error('Error generating random prompt:', { 
+                    error: err.message,
+                    context: 'get-random-prompt'
+                });
+                res.status(500).json({ error: 'Failed to generate prompt' });
             }
         }
     }

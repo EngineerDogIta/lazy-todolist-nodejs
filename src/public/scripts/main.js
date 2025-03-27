@@ -46,4 +46,24 @@ async function toggleTaskCompletion(taskId) {
     } catch (error) {
         console.error('Error toggling task completion:', error);
     }
-} 
+}
+
+async function generateRandomPrompt() {
+    try {
+        const response = await fetch('/random-prompt');
+        const data = await response.json();
+        
+        if (data.prompt) {
+            const taskPromptTextarea = document.getElementById('taskPrompt');
+            taskPromptTextarea.value = data.prompt;
+        }
+    } catch (error) {
+        console.error('Error generating prompt:', error);
+    }
+}
+
+// Enable the AI buttons once the page is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('generateTasksBtn').disabled = false;
+    document.getElementById('generatePromptBtn').disabled = false;
+});
