@@ -299,10 +299,7 @@ const taskController = {
             const generatedTasks = await aiTaskService.generateTasksFromPrompt(taskPrompt);
             
             // Create tasks from the generated suggestions
-            for (const taskText of generatedTasks) {
-                const task = new Task();
-                task.title = taskText;
-                task.depth = 0;
+            for (const task of generatedTasks) {
                 await taskRepository.save(task);
             }
 
