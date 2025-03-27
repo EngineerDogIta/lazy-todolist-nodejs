@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/typeorm.config';
 import { Task } from '../models/Task';
 import logger from '../config/logger';
+import { aiTaskService } from '../service/aiTaskService';
 
 const taskRepository = AppDataSource.getRepository(Task);
 
@@ -238,30 +239,20 @@ const taskController = {
             const tasks = await taskRepository
                 .createQueryBuilder('task')
                 .leftJoinAndSelect('task.childTasks', 'childTasks')
-                .leftJoinAndSelect('childTasks.childTasks', 'grandChildTasks')
-                .leftJoinAndSelect('grandChildTasks.childTasks', 'greatGrandChildTasks')
-                .leftJoinAndSelect('task.parentTask', 'parentTask')
                 .where('task.parentTask IS NULL')
                 .orderBy('task.createdAt', 'DESC')
                 .getMany();
-            
-            logger.debug('Tasks retrieved for home page', { 
-                count: tasks.length,
-                timestamp: new Date().toISOString()
-            });
 
-            // Get error message from query params if it exists
+            // Get error from query params if it exists
             const error = req.query.error ? decodeURIComponent(req.query.error as string) : null;
 
             res.render('home', {
                 tasklist: tasks,
-                pageTitle: 'Giornalino a puntini',
-                error: error
+                error: error,
+                pageTitle: 'Todo List'
             });
         } catch (err) {
-            if (err instanceof Error) {
-                handleError(err, res, 'get-home-tasks');
-            }
+            handleError(err instanceof Error ? err : new Error(String(err)), res, 'get-home-tasks');
         }
     },
 
@@ -284,6 +275,43 @@ const taskController = {
         } catch (err) {
             if (err instanceof Error) {
                 handleError(err, res, 'get-all-tasks');
+            }
+        }
+    },
+
+    generateTasks: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { taskPrompt } = req.body;
+            if (!taskPrompt) {
+                throw new Error('Task prompt is required');
+            }
+
+            const generatedTasks = await aiTaskService.generateTasksFromPrompt(taskPrompt);
+            
+            // Create tasks from the generated suggestions
+            for (const task of generatedTasks) {
+                await taskRepository.save(task);
+            }
+
+            res.redirect('/');
+        } catch (err) {
+            if (err instanceof Error) {
+                res.redirect(`/?error=${encodeURIComponent(err.message)}`);
+            }
+        }
+    },
+
+    getRandomPrompt: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const prompt = await aiTaskService.generateRandomPrompt();
+            res.json({ prompt });
+        } catch (err) {
+            if (err instanceof Error) {
+                logger.error('Error generating random prompt:', { 
+                    error: err.message,
+                    context: 'get-random-prompt'
+                });
+                res.status(500).json({ error: 'Failed to generate prompt' });
             }
         }
     }

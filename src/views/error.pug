@@ -3,13 +3,32 @@ extends layouts/main-layout.pug
 block content
     .container.text-center.py-5
         .error-container
-            h1.display-4.text-danger.mb-4
-                i.fas.fa-exclamation-circle.mr-2
-                | Error
-            h2.mb-4= message
-            if error && Object.keys(error).length > 0
-                .alert.alert-danger
-                    pre.mb-0= error.stack
-            a.btn.btn-primary.mt-4(href="/")
-                i.fas.fa-home.mr-2
-                | Back to Home 
+            if message.includes('Ollama service')
+                .alert.alert-warning.shadow-sm.mb-4.animate__animated.animate__fadeIn
+                    .d-flex.align-items-center
+                        i.fas.fa-robot.fa-2x.mr-3
+                        .text-left
+                            h4.alert-heading AI Service Unavailable
+                            p.mb-0= message
+                    hr
+                    p.mb-0.text-muted.small
+                        i.fas.fa-info-circle.mr-1
+                        | Need help? Check if Ollama is running locally on your machine.
+                .mt-4
+                    a.btn.btn-primary.mr-2(href="/")
+                        i.fas.fa-home.mr-2
+                        | Back to Home
+                    button.btn.btn-outline-secondary(onclick="window.location.reload()")
+                        i.fas.fa-sync-alt.mr-2
+                        | Try Again
+            else
+                h1.display-4.text-danger.mb-4
+                    i.fas.fa-exclamation-circle.mr-2
+                    | Error
+                h2.mb-4= message
+                if error && Object.keys(error).length > 0
+                    .alert.alert-danger
+                        pre.mb-0= error.stack
+                a.btn.btn-primary.mt-4(href="/")
+                    i.fas.fa-home.mr-2
+                    | Back to Home 

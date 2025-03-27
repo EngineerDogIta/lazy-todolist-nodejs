@@ -3,9 +3,27 @@ extends layouts/main-layout.pug
 block content
     .container-fluid.px-4
         if error
-            .alert.alert-danger.mb-4(role="alert")
-                i.fas.fa-exclamation-circle.mr-2
-                = error
+            if error.includes('Ollama service')
+                .alert.alert-warning.mb-4.animate__animated.animate__fadeIn.alert-dismissible(role="alert")
+                    button.close(type="button" data-dismiss="alert" aria-label="Close")
+                        span(aria-hidden="true") &times;
+                    .d-flex.align-items-center
+                        i.fas.fa-robot.fa-2x.mr-3
+                        .text-left
+                            h4.alert-heading AI Service Unavailable
+                            p.mb-0= error
+                    hr
+                    p.mb-0.text-muted.small
+                        i.fas.fa-info-circle.mr-1
+                        | Need help? Check if Ollama is running locally on your machine.
+                    .mt-2
+                        code.small.text-muted Run: ollama serve
+            else
+                .alert.alert-danger.mb-4.animate__animated.animate__fadeIn.alert-dismissible(role="alert")
+                    button.close(type="button" data-dismiss="alert" aria-label="Close")
+                        span(aria-hidden="true") &times;
+                    i.fas.fa-exclamation-circle.mr-2
+                    = error
         
         .row
             // Left column - Scrollable task list
@@ -13,10 +31,10 @@ block content
                 .todo__header.d-flex.justify-content-between.align-items-center
                     h4.todo__title.mb-0
                         i.fas.fa-tasks.text-primary.mr-2
-                        | Compito da fare
+                        | Tasks
                     button.btn.btn-outline-primary.btn-sm(
                         type="button"
-                        onclick="window.location.reload()"
+                        onclick="window.location.href='/'"
                         data-testid="refresh-button"
                     )
                         i.fas.fa-sync-alt.fa-fw
@@ -29,7 +47,12 @@ block content
             .col-md-4.task-input-column
                 h4.todo__title
                     i.fas.fa-plus-circle.text-primary.mr-2
-                    | Nuovo Task
+                    | New Boring manually written task
+                p.text-muted.mb-3
+                    | This is the boring way to write a task.
+                    | Don't use it.
+                    | The Carpal tunnel syndrome will be on your side.
+                    | Tendinopathy too.
                 .add-form.sticky-top
                     form(action="/" method="post")
                         .add-form__input-group
@@ -44,3 +67,34 @@ block content
                                 button.btn.btn-primary(type="submit")
                                     i.fas.fa-plus.mr-2
                                     | Aggiungi
+                // AI Task Generation Section
+                .ai-task-generator.mt-4
+                    h4.todo__title
+                        i.fas.fa-robot.text-primary.mr-2
+                        | AI Task Generator
+                    form(action="/generate-tasks" method="post" id="aiTaskForm")
+                        .add-form__input-group
+                            textarea.form-control(
+                                name="taskPrompt" 
+                                id="taskPrompt" 
+                                placeholder="Describe your task in natural language..." 
+                                required
+                                rows="3"
+                                disabled=error && error.includes('Ollama service')
+                            )
+                            .add-form__button-container
+                                button.btn.btn-primary.mr-2(
+                                    type="submit" 
+                                    id="generateTasksBtn"
+                                    disabled=error && error.includes('Ollama service')
+                                )
+                                    i.fas.fa-magic.mr-2
+                                    | Generate Tasks
+                                button.btn.btn-secondary(
+                                    type="button" 
+                                    id="generatePromptBtn" 
+                                    onclick="generateRandomPrompt()"
+                                    disabled=error && error.includes('Ollama service')
+                                )
+                                    i.fas.fa-ellipsis-h.mr-2 
+                                    | Generate Prompt
