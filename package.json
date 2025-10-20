@@ -36,7 +36,7 @@
   },
   "description": "A lazy todolist web app for lazy todoersss",
   "devDependencies": {
-    "@playwright/test": "^1.51.1",
+    "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/body-parser": "^1.19.5",
